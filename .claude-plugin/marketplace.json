@@ -1,0 +1,14 @@
+{
+  "name": "viral-video-lab",
+  "description": "Marketplace for the viral-video-lab plugin.",
+  "owner": {
+    "name": "Андрій"
+  },
+  "plugins": [
+    {
+      "name": "viral-video-lab",
+      "source": "./",
+      "description": "Finds viral short videos, ranks a top-5, analyses why they work and helps recreate the idea."
+    }
+  ]
+}

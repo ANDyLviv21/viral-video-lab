@@ -1,0 +1,6 @@
+.superpowers/
+runs/
+library/
+profile.md
+*.mp4
+__pycache__/
