@@ -4,7 +4,10 @@ Usage:
     py -3.12 scripts/rank.py <candidates.json> --config <ranking.json>
         --out-json <ranked.json> --out-md <top5.md>
 
-Exit codes: 0 success (even with fewer than top_n videos), 2 unreadable input.
+Exit codes: 0 success (even with fewer than top_n videos, and even when some
+candidate records are malformed: those go to "dropped" with reason "malformed");
+2 when the candidates file is unreadable, not JSON, has no "candidates" list or
+a bad "generated_at", or when the config is unreadable or lacks a required key.
 Standard library only. Console output is ASCII only.
 """
 import argparse
@@ -33,6 +36,61 @@ def load_candidates(path) -> dict:
     if not isinstance(data, dict) or not isinstance(data.get("candidates"), list):
         raise ValueError("candidates file must be an object with a 'candidates' list")
     return data
+
+
+NUMERIC_FIELDS = ("duration_sec", "views", "likes", "comments", "shares",
+                  "saves", "author_median_views", "outlier_score")
+
+
+def _is_number(v) -> bool:
+    return isinstance(v, (int, float)) and not isinstance(v, bool)
+
+
+def validate_config(cfg) -> None:
+    """Raise ValueError naming the first missing or invalid config key."""
+    if not isinstance(cfg, dict):
+        raise ValueError("config must be a JSON object")
+    for key in ("max_duration_sec", "period_days", "min_views", "top_n",
+                "reserve_n", "max_per_author"):
+        if not _is_number(cfg.get(key)):
+            raise ValueError("config key missing or not a number: " + key)
+    for group, names in (("weights", ("virality", "engagement")),
+                         ("engagement_weights", ENGAGEMENT_METRICS)):
+        sub = cfg.get(group)
+        if not isinstance(sub, dict):
+            raise ValueError("config key missing or not an object: " + group)
+        for name in names:
+            if not _is_number(sub.get(name)):
+                raise ValueError("config key missing or not a number: {}.{}"
+                                 .format(group, name))
+
+
+def is_malformed(c) -> bool:
+    if not isinstance(c, dict):
+        return True
+    if not isinstance(c.get("platform"), str) or c.get("id") is None:
+        return True
+    if any(c.get(f) is not None and not _is_number(c[f]) for f in NUMERIC_FIELDS):
+        return True
+    posted = c.get("posted_at")
+    if not isinstance(posted, str):
+        return True
+    try:
+        parse_iso(posted)
+    except ValueError:
+        return True
+    return False
+
+
+def split_malformed(cands: list) -> tuple:
+    good, bad = [], []
+    for c in cands:
+        if is_malformed(c):
+            bad.append({**c, "reason": "malformed"} if isinstance(c, dict)
+                       else {"raw": c, "reason": "malformed"})
+        else:
+            good.append(c)
+    return good, bad
 
 
 def filled(c: dict) -> int:
@@ -203,12 +261,15 @@ def main(argv=None) -> int:
         data = load_candidates(args.candidates)
         with open(args.config, encoding="utf-8") as fh:
             cfg = json.load(fh)
+        validate_config(cfg)
         now = parse_iso(data["generated_at"])
     except (OSError, ValueError, KeyError, TypeError) as exc:
         print("error: cannot read input: {}".format(_ascii(exc)), file=sys.stderr)
         return 2
 
-    kept, dropped = filter_candidates(dedupe(data["candidates"]), cfg, now)
+    good, malformed = split_malformed(data["candidates"])
+    kept, dropped = filter_candidates(dedupe(good), cfg, now)
+    dropped = malformed + dropped
     result = select_top(score_candidates(kept, cfg), cfg)
     result.update({"topic": data.get("topic"),
                    "generated_at": data["generated_at"]})

@@ -6,7 +6,7 @@ Input of `scripts/rank.py`. Written by the collection stage, read by the ranking
 py -3.12 scripts/rank.py <candidates.json> --config config/ranking.json --out-json <ranked.json> --out-md <top5.md>
 ```
 
-Exit codes: `0` success (also when fewer than `top_n` videos survive), `2` input or config file unreadable or malformed.
+Exit codes: `0` success (also when fewer than `top_n` videos survive, and when some records are malformed), `2` when the candidates file is unreadable, not JSON, has no `candidates` list or a bad `generated_at`, or when the config file is unreadable or lacks a required key (one ASCII line on stderr names the key).
 
 ## File
 
@@ -83,4 +83,4 @@ Each `top` / `reserve` record keeps all input fields and adds:
 | `virality_pct`, `engagement_pct` | Per-platform percentile rank in `(0, 1]`. |
 | `score` | `weights.virality * virality_pct + weights.engagement * engagement_pct`. |
 
-Each `dropped` record keeps all input fields plus `reason`: `no_views`, `duration`, `period` or `min_views`.
+Each `dropped` record keeps all input fields plus `reason`: `no_views`, `duration`, `period`, `min_views` or `malformed`. A record is `malformed` (and the run continues) when it is not an object, has no string `platform` or no `id`, has a non-numeric `views` or other numeric field, or has a missing or unparseable `posted_at`. A malformed non-object entry is stored as `{"raw": <entry>, "reason": "malformed"}`.

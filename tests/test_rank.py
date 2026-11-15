@@ -179,6 +179,38 @@ class RankTests(unittest.TestCase):
             self.assertIn(c["url"], md)
         self.assertIn("saves", md)
 
+    def test_config_missing_key_returns_2(self):
+        src = self.tmp / "candidates.json"
+        write_file(src, {"topic": "t", "generated_at": NOW.isoformat(),
+                         "candidates": [cand("a")]})
+        for broken in ({k: v for k, v in CFG.items() if k != "period_days"},
+                       {**CFG, "weights": {"virality": 0.6}}):
+            cfg = self.tmp / "ranking.json"
+            write_file(cfg, broken)
+            err = io.StringIO()
+            with contextlib.redirect_stdout(io.StringIO()),                     contextlib.redirect_stderr(err):
+                code = rank.main([str(src), "--config", str(cfg),
+                                  "--out-json", str(self.tmp / "r.json"),
+                                  "--out-md", str(self.tmp / "t.md")])
+            self.assertEqual(code, 2)
+            self.assertEqual(len(err.getvalue().strip().splitlines()), 1)
+
+    def test_malformed_records_go_to_dropped(self):
+        bad = {
+            "notdict": "just a string",
+            "badviews": cand("badviews", views="lots"),
+            "baddate": cand("baddate", posted_at="yesterday"),
+            "nodate": cand("nodate", posted_at=None),
+        }
+        for name, record in bad.items():
+            with self.subTest(name):
+                self.assertEqual(self.run_main([record, cand("ok")]), 0)
+                ranked = json.loads(
+                    (self.tmp / "ranked.json").read_text(encoding="utf-8"))
+                self.assertEqual([t["id"] for t in ranked["top"]], ["ok"])
+                self.assertEqual(
+                    [d["reason"] for d in ranked["dropped"]], ["malformed"])
+
     def test_unreadable_file_returns_2(self):
         cfg = self.tmp / "ranking.json"
         write_file(cfg, CFG)
