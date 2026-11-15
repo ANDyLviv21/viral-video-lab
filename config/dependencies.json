@@ -1,0 +1,262 @@
+[
+  {
+    "id": "watch",
+    "kind": "skill",
+    "name": "watch",
+    "required": true,
+    "used_by": [
+      3,
+      8
+    ],
+    "install_hint": "встановити скіл watch у ~/.claude/skills",
+    "extra_paths": []
+  },
+  {
+    "id": "yt-dlp",
+    "kind": "program",
+    "name": "yt-dlp",
+    "required": true,
+    "used_by": [
+      2
+    ],
+    "install_hint": "winget install yt-dlp.yt-dlp",
+    "extra_paths": []
+  },
+  {
+    "id": "ffmpeg",
+    "kind": "program",
+    "name": "ffmpeg",
+    "required": true,
+    "used_by": [
+      2,
+      3,
+      8
+    ],
+    "install_hint": "winget (пакет FFmpeg; ставить також ffprobe)",
+    "extra_paths": []
+  },
+  {
+    "id": "ffprobe",
+    "kind": "program",
+    "name": "ffprobe",
+    "required": true,
+    "used_by": [
+      2,
+      3,
+      8
+    ],
+    "install_hint": "ставиться разом з ffmpeg через winget",
+    "extra_paths": []
+  },
+  {
+    "id": "hyperframes",
+    "kind": "plugin",
+    "name": "hyperframes",
+    "required": true,
+    "used_by": [
+      7
+    ],
+    "install_hint": "встановити плагін hyperframes з marketplace heygen-com/hyperframes у Claude Code",
+    "extra_paths": []
+  },
+  {
+    "id": "metrics-source",
+    "kind": "connector",
+    "name": "ScrapeCreators or vidIQ",
+    "required": true,
+    "used_by": [
+      1
+    ],
+    "install_hint": "увімкнути конектор ScrapeCreators або vidIQ у налаштуваннях конекторів застосунку Claude",
+    "extra_paths": []
+  },
+  {
+    "id": "reference-video-replica-qc",
+    "kind": "skill",
+    "name": "reference-video-replica-qc",
+    "required": false,
+    "used_by": [
+      3,
+      8
+    ],
+    "install_hint": "встановити скіл reference-video-replica-qc у ~/.claude/skills",
+    "extra_paths": []
+  },
+  {
+    "id": "ffmpeg-skill",
+    "kind": "skill",
+    "name": "ffmpeg-skill",
+    "required": false,
+    "used_by": [
+      2,
+      8
+    ],
+    "install_hint": "встановити скіл ffmpeg-skill у ~/.claude/skills",
+    "extra_paths": []
+  },
+  {
+    "id": "last30days",
+    "kind": "skill",
+    "name": "last30days",
+    "required": false,
+    "used_by": [
+      1,
+      4
+    ],
+    "install_hint": "встановити скіл last30days у ~/.claude/skills",
+    "extra_paths": []
+  },
+  {
+    "id": "social",
+    "kind": "skill",
+    "name": "social",
+    "required": false,
+    "used_by": [
+      4,
+      5
+    ],
+    "install_hint": "встановити скіл social у ~/.claude/skills",
+    "extra_paths": []
+  },
+  {
+    "id": "ad-creative",
+    "kind": "skill",
+    "name": "ad-creative",
+    "required": false,
+    "used_by": [
+      4,
+      5
+    ],
+    "install_hint": "встановити скіл ad-creative у ~/.claude/skills",
+    "extra_paths": []
+  },
+  {
+    "id": "ads",
+    "kind": "skill",
+    "name": "ads",
+    "required": false,
+    "used_by": [
+      4,
+      5
+    ],
+    "install_hint": "встановити скіл ads у ~/.claude/skills",
+    "extra_paths": []
+  },
+  {
+    "id": "video-editing",
+    "kind": "skill",
+    "name": "video-editing",
+    "required": false,
+    "used_by": [
+      7
+    ],
+    "install_hint": "встановити скіл video-editing у ~/.claude/skills",
+    "extra_paths": []
+  },
+  {
+    "id": "video-prompting",
+    "kind": "skill",
+    "name": "video-prompting",
+    "required": false,
+    "used_by": [
+      7
+    ],
+    "install_hint": "встановити скіл video-prompting у ~/.claude/skills",
+    "extra_paths": []
+  },
+  {
+    "id": "higgsfield",
+    "kind": "skill",
+    "name": "higgsfield",
+    "required": false,
+    "used_by": [
+      7
+    ],
+    "install_hint": "встановити скіл higgsfield у ~/.claude/skills",
+    "extra_paths": []
+  },
+  {
+    "id": "threejs",
+    "kind": "skill",
+    "name": "threejs",
+    "required": false,
+    "used_by": [
+      7
+    ],
+    "install_hint": "встановити скіл threejs у ~/.claude/skills",
+    "extra_paths": []
+  },
+  {
+    "id": "text-to-blender",
+    "kind": "skill",
+    "name": "text-to-blender",
+    "required": false,
+    "used_by": [
+      7
+    ],
+    "install_hint": "встановити скіл text-to-blender у ~/.claude/skills",
+    "extra_paths": []
+  },
+  {
+    "id": "remotion-best-practices",
+    "kind": "skill",
+    "name": "remotion-best-practices",
+    "required": false,
+    "used_by": [
+      7
+    ],
+    "install_hint": "встановити скіл remotion-best-practices у ~/.claude/skills",
+    "extra_paths": []
+  },
+  {
+    "id": "whisper",
+    "kind": "program",
+    "name": "whisper",
+    "required": false,
+    "used_by": [
+      3
+    ],
+    "install_hint": "встановити whisper у віртуальне середовище ~/whisper-env (pip)",
+    "extra_paths": [
+      "~/whisper-env/Scripts/whisper.exe"
+    ]
+  },
+  {
+    "id": "node",
+    "kind": "program",
+    "name": "node",
+    "required": false,
+    "used_by": [
+      7,
+      "публікація"
+    ],
+    "install_hint": "встановити Node.js (наприклад через winget)",
+    "extra_paths": []
+  },
+  {
+    "id": "git",
+    "kind": "program",
+    "name": "git",
+    "required": false,
+    "used_by": [
+      7,
+      "публікація"
+    ],
+    "install_hint": "встановити Git (наприклад через winget)",
+    "extra_paths": []
+  },
+  {
+    "id": "gh",
+    "kind": "program",
+    "name": "gh",
+    "required": false,
+    "used_by": [
+      7,
+      "публікація"
+    ],
+    "install_hint": "winget install GitHub.cli",
+    "extra_paths": [
+      "C:/Program Files/GitHub CLI/gh.exe"
+    ]
+  }
+]
