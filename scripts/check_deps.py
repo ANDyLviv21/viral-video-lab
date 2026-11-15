@@ -113,7 +113,11 @@ def main(argv: list[str]) -> int:
     args = parser.parse_args(argv)
 
     home = Path(args.home) if args.home else Path.home()
-    manifest = load_manifest(args.manifest)
+    try:
+        manifest = load_manifest(args.manifest)
+    except (OSError, ValueError) as exc:
+        print(f"Помилка маніфеста {args.manifest}: {exc}")
+        return 2
     results = [check_item(item, home) for item in manifest]
     summary = summarize(results, manifest)
 

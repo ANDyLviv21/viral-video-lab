@@ -169,6 +169,30 @@ class MainTests(unittest.TestCase):
         self.assertEqual(code, 1)
         self.assertIn("Андрій".encode("cp1251"), raw.getvalue())
 
+    def test_non_cp1251_home_path_does_not_crash(self):
+        home = self.tmp / "Андрій-日本"
+        home.mkdir()
+        path = self.tmp / "deps.json"
+        path.write_text(json.dumps([make_item()]), encoding="utf-8")
+        raw = io.BytesIO()
+        stream = io.TextIOWrapper(raw, encoding="cp1251", errors="strict")
+        old = sys.stdout
+        sys.stdout = stream
+        try:
+            code = check_deps.main(["--manifest", str(path), "--home", str(home)])
+            stream.flush()
+        finally:
+            sys.stdout = old
+        self.assertEqual(code, 1)
+        self.assertIn("Андрій-??".encode("cp1251"), raw.getvalue())
+
+    def test_missing_manifest_returns_2(self):
+        out = io.StringIO()
+        with contextlib.redirect_stdout(out):
+            code = check_deps.main(["--manifest", str(self.tmp / "nope.json")])
+        self.assertEqual(code, 2)
+        self.assertEqual(len(out.getvalue().strip().splitlines()), 1)
+
 
 if __name__ == "__main__":
     unittest.main()

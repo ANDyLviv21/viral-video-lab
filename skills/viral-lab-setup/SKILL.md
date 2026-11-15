@@ -1,6 +1,6 @@
 ---
 name: viral-lab-setup
-description: Checks and prepares the viral-video-lab environment on a new PC: dependencies, connectors and the channel profile. Use when the user says "перевір залежності viral lab", "налаштуй viral-video-lab", "viral lab setup" or "check viral lab dependencies".
+description: Checks and prepares the viral-video-lab environment on a new PC (dependencies, connectors and the channel profile). Use when the user says перевір залежності viral lab, налаштуй viral-video-lab, viral lab setup or check viral lab dependencies.
 ---
 
 # Viral Lab Setup
