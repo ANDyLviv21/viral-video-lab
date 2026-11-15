@@ -1,0 +1,4 @@
+{"weights": {"virality": 0.6, "engagement": 0.4},
+ "engagement_weights": {"likes": 1, "comments": 2, "saves": 3, "shares": 3},
+ "max_duration_sec": 90, "period_days": 30, "min_views": 10000,
+ "top_n": 5, "reserve_n": 5, "max_per_author": 2}
