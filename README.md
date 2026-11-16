@@ -44,10 +44,10 @@ viral-scout  ->  viral-breakdown  ->  viral-recreate
 
 ## Встановлення з GitHub
 
-Репозиторій ще не опублікований, тому `<власник>` треба замінити на справжній обліковий запис, коли він з'явиться.
+Репозиторій: [github.com/ANDyLviv21/viral-video-lab](https://github.com/ANDyLviv21/viral-video-lab).
 
 ```
-/plugin marketplace add <власник>/viral-video-lab
+/plugin marketplace add ANDyLviv21/viral-video-lab
 /plugin install viral-video-lab@viral-video-lab
 ```
 
