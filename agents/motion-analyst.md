@@ -17,6 +17,7 @@ Your request contains ABSOLUTE paths. Do not assume a working directory and do n
 - the video file (a local .mp4), used only for `ffprobe` (duration, frame rate, size)
 - the format reference `motion-table.md` (the plugin file `references/motion-table.md`)
 - the output file to write, `analysis/<nn>-motion.md`
+- optional: the user's `profile.md`, as an absolute path supplied by the orchestrating skill. If no path is given or the file cannot be read, write the report in Ukrainian
 
 Read the format reference first and follow it exactly.
 
@@ -37,6 +38,6 @@ Read the format reference first and follow it exactly.
 
 ## Output
 
-Write the output file in the language given in the user's `profile.md` (default Ukrainian). The column headers and section headings are fixed and are written exactly as in the format reference, in this order: `t, с`, `Шот`, `Камера: рух`, `Камера: швидкість`, `Перехід`, `Motion-елементи`, `3D-об'єкти`, `UI-графіка`, `Текст`, `Поява тексту`, `Easing`, `Звуковий акцент`, `Як відтворити`, `Кадр-доказ`.
+Write the output file in the language given in the `profile.md` whose path you were handed (Ukrainian if none was given or it is unreadable). The column headers and section headings are fixed and are written exactly as in the format reference, in this order: `t, с`, `Шот`, `Камера: рух`, `Камера: швидкість`, `Перехід`, `Motion-елементи`, `3D-об'єкти`, `UI-графіка`, `Текст`, `Поява тексту`, `Easing`, `Звуковий акцент`, `Як відтворити`, `Кадр-доказ`.
 
 Finish by checking that the file has one row per second, 14 columns in every row and the three sections. Reply with the output path and the number of rows only.

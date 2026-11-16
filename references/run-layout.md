@@ -38,7 +38,8 @@ A stage writes its value after it finishes successfully, never before. A stage t
 | 1 scout | `trend-scout` | `candidates.json`, `trends.md` |
 | 2 select | `top-selector` | `ranked.json`, `top5.md`, `videos/` |
 | Stop 1: user approves references | none | `approved.md` |
-| 3 breakdown | `motion-analyst` | `analysis/<nn>-motion.md`, `analysis/<nn>-frames/` |
+| 3 prepare (before the agent runs) | skill | `analysis/<nn>-frames/` (frames and transcript, from `/watch`) |
+| 3 breakdown | `motion-analyst` | `analysis/<nn>-motion.md` |
 | 4 breakdown | `hook-marketer` | `analysis/<nn>-marketing.md` |
 | 5 review | `review-council` | `review.md` |
 | 6 synthesis | `synthesizer` | `playbook.md`, `combo-brief.md` |
