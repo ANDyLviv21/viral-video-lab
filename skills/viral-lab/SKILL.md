@@ -39,25 +39,11 @@ When the user wants a new run (or gives a topic), hand over to `viral-scout` and
 
 ## 4. Resume: the first unfinished stage
 
-For a run chosen in step 2, or a run folder the user names, read `run.json` and look at `stage`. `stage` records a FINISHED stage, so the work resumes at the step after it. The stage skills own their entry checks and refuse to start when an earlier file is missing; this table only says whom to call and where:
+For a run chosen in step 2, or a run folder the user names, read `run.json` and look at `stage`. `stage` records a FINISHED stage, so the work resumes at the step after it. The stage skills own their entry checks and refuse to start when an earlier file is missing; the sections named below say whom to call and where:
 
-| `stage` | Finished | Hand over to | Entry point |
-|---------|----------|--------------|-------------|
-| `brief` | brief and run folder | `viral-scout` | step 4, the `trend-scout` agent (the spend is shown again; credits already in `run.json` count) |
-| `scout` | candidates and trends | `viral-scout` | step 4, the `top-selector` agent |
-| `select` | top-5 and downloads | `viral-scout` | step 5, Stop 1: show `top5.md` and ask the user to approve |
-| `approve` | references approved | `viral-breakdown` | from the start (its step 2) |
-| `breakdown` | motion and marketing files | `viral-breakdown` | step 6, the council |
-| `review` | `review.md` | `viral-recreate` | step 4, synthesis |
-| `synthesis` | `playbook.md`, `combo-brief.md` | `viral-recreate` | step 5, Stop 2 (do not run the synthesizer again) |
-| `choose` | `choice.md` | `viral-recreate` | step 6, recreation (it reads `recreation/stop3.md` first) |
-| `recreate` | `draft.mp4` | `viral-recreate` | step 7, quality check |
-| `qc` | verdict accepted | `viral-recreate` | step 8, export |
-| `done` | everything | nobody | step 5 of this skill, feedback |
+Each stage skill documents its own resume points in its section `Resuming a run` (`viral-scout`, `viral-breakdown`) or step 2 (`viral-recreate`). Read that section of the skill you are handing over to, and do not keep a second copy of the mapping here. In short, by `stage`: `brief`, `scout`, `select` go to `viral-scout`; `approve`, `breakdown` go to `viral-breakdown`; `review`, `synthesis`, `choose`, `recreate`, `qc` go to `viral-recreate`; `done` goes to nobody (step 5 of this skill). If this summary and a stage skill ever disagree, the stage skill and `../../references/run-layout.md` win and this summary must be corrected.
 
-The `viral-recreate` rows repeat that skill's own resume list (its step 2). If the two ever differ, that skill and `../../references/run-layout.md` win and this table must be corrected. A `stage` value that is not in `run-layout.md` is never guessed: show it to the user and stop.
-
-Before the handover tell the user, in the report language: the run, its `stage`, what is already on disk, and what will run now. Wait for their go-ahead. When you hand over, say explicitly which step to start from, using the table; the stage skill decides whether its own checks allow it.
+Before the handover tell the user, in the report language: the run, its `stage`, what is already on disk, and what will run now. Wait for their go-ahead. When you hand over, say explicitly which step to start from, taken from the stage skill's own resume section; the stage skill decides whether its own checks allow it.
 
 **Files from finished stages are not overwritten without asking.** Before any step that would write a file that already exists from a finished stage (for example re-running the scout with `candidates.json` present, or the council with `review.md` present), stop and ask in this form: name the file (the full path), say what would be lost (for example "`review.md` and the three role files, made on 2026-11-15, would be replaced; the old text cannot be restored"), and offer the alternatives (keep it and go on, or save the old file under a new name first). Wait for a clear yes that names that file. Silence, a question, or a yes to something else is not a yes. One yes covers the files you named, not the whole run. If the user wants to redo a finished stage on purpose, ask the same question once for every file that stage owns (the ownership table in `../../references/run-layout.md`).
 
