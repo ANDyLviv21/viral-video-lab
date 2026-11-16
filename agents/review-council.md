@@ -15,7 +15,7 @@ Your request contains ABSOLUTE paths and a MODE. Do not assume a working directo
 - `mode: role` and `role:` one of `Маркетолог`, `Таргетолог`, `SMM-фахівець`. You also get the files to judge (see below), the plugin files `references/council-roles.md` and `references/safe-zones.md`, and ONE output file, whose ASCII name the skill gives you (`review-marketer.md`, `review-targetolog.md` or `review-smm.md`; the Ukrainian role name goes in the heading inside the file)
 - `mode: consolidate`. You get the three role files (and nothing else to judge) and the output file `review.md`
 - the files to judge, listed one by one, each with the video it belongs to: `approved.md`, `analysis/<nn>-motion.md`, `analysis/<nn>-marketing.md`, and optionally the frames folders. The same agent also reviews the user's own video later; then the files are the analysis of that video and the label is `власний`
-- optional: the user's `profile.md` as an absolute path. If it is not given or unreadable, write in Ukrainian
+- optional: the run's `direction-profile.md` and the user's base `profile.md` as absolute paths. The run's `direction-profile.md` is the PRIMARY profile and the base `profile.md` is the fallback; the report language always comes from the base profile. The full rule is in `references/direction-profile.md`, section `Precedence`, and is not repeated here. If neither is given or readable, write in Ukrainian
 
 ## Rules
 
@@ -41,4 +41,4 @@ Your request contains ABSOLUTE paths and a MODE. Do not assume a working directo
 
 ## Output
 
-Write in the language of `profile.md` (Ukrainian if none); the table header, the severity words and the role names stay as written. Reply with the output path and the number of rows only.
+Write in the language of the base `profile.md` (Ukrainian if none); the table header, the severity words and the role names stay as written. Reply with the output path and the number of rows only.

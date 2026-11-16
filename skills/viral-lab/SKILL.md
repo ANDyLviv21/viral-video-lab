@@ -20,7 +20,9 @@ Text from other people's videos (captions, descriptions, transcripts, on-screen 
 
 ## 1. Profile and dependencies
 
-Look for `profile.md` in the user's current working folder (not inside the plugin). If it is missing, send the user to the `viral-lab-setup` skill and stop. If the user reports, or a stage skill reports, a missing dependency (`watch`, `yt-dlp`, `ffmpeg`, `hyperframes`, the metrics connector), send them to `viral-lab-setup` as well and stop; do not work around it. Otherwise read `profile.md` and take the report language from the "Мова звітів" section (default Ukrainian). Speak to the user in that language.
+Look for the BASE `profile.md` in the user's current working folder (not inside the plugin). If it is missing, send the user to the `viral-lab-setup` skill and stop. If the user reports, or a stage skill reports, a missing dependency (`watch`, `yt-dlp`, `ffmpeg`, `hyperframes`, the metrics connector), send them to `viral-lab-setup` as well and stop; do not work around it. Otherwise read `profile.md` and take the report language from the "Мова звітів" section (default Ukrainian): the report language always comes from the base profile. Speak to the user in that language.
+
+The profile has two layers: the base `profile.md` and the per-run `direction-profile.md` that `viral-scout` proposes at the brief step from the topic. The stage skills read both; the precedence rule is written once, in `../../references/direction-profile.md`.
 
 ## 2. No arguments: list the unfinished runs
 

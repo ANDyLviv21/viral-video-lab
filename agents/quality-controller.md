@@ -22,7 +22,7 @@ Your request contains ABSOLUTE paths. Do not assume a working directory and do n
 - the plugin file `references/safe-zones.md`
 - `recreation/stop3.md`, if it exists (lines with `відхилено:` name items that stayed placeholder cards because the user declined the paid generation)
 - the output file `qc.md`
-- the user's `profile.md`, optional. If it is not given or unreadable, write in Ukrainian
+- optional: the run's `direction-profile.md` and the user's base `profile.md`. The run's `direction-profile.md` is the PRIMARY profile and the base `profile.md` is the fallback; the report language always comes from the base profile. The full rule is in `references/direction-profile.md`, section `Precedence`, and is not repeated here. If neither is given or readable, write in Ukrainian
 
 ## Rules
 
@@ -54,4 +54,4 @@ Your request contains ABSOLUTE paths. Do not assume a working directory and do n
 - `## Артефакти` - the list, each with a timecode
 - `## Вердикт` - exactly one of `готово` or `доопрацювати`. If `доопрацювати`, a numbered list of fixes, each with a timecode, what to change and which engine step it touches, and one line saying whether a fix needs a paid action
 
-The headings and the verdict words are written exactly as above; the rest is in the language of `profile.md` (Ukrainian if none). Reply with the output path and the verdict word only.
+The headings and the verdict words are written exactly as above; the rest is in the language of the base `profile.md` (Ukrainian if none). Reply with the output path and the verdict word only.

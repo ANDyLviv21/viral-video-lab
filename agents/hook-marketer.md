@@ -23,7 +23,7 @@ Your request contains ABSOLUTE paths. Do not assume a working directory and do n
 - the plugin files `references/marketing-checklist.md` and `references/safe-zones.md`, and `config/sources.json`
 - the output file to write, `analysis/<nn>-marketing.md`
 - the comments file for this video, `analysis/<nn>-inputs/comments.json`, if the skill fetched comments for it. The skill decided per video, from the remaining ScrapeCreators allowance and the user's consent, which videos get a comments request; you do not decide it and you do not make the request. A file that says `коментарі недоступні`, or no file at all, means this video has no comments
-- optional: the user's `profile.md`, as an absolute path. If no path is given or it cannot be read, write the report in Ukrainian
+- optional: the run's `direction-profile.md` and the user's base `profile.md`, as absolute paths. The run's `direction-profile.md` is the PRIMARY profile and the base `profile.md` is the fallback; the report language always comes from the base profile. The full rule is in `references/direction-profile.md`, section `Precedence`, and is not repeated here. If no path is given or neither can be read, write the report in Ukrainian
 
 Read the checklist first and follow it exactly: eight sections, these headings, this order.
 
@@ -46,6 +46,6 @@ Read the checklist first and follow it exactly: eight sections, these headings, 
 
 ## Output
 
-Write the output file in the language of `profile.md` (Ukrainian if none). Write the eight headings exactly as listed under `Exact heading strings` in the checklist.
+Write the output file in the language of the base `profile.md` (Ukrainian if none). Write the eight headings exactly as listed under `Exact heading strings` in the checklist.
 
 Reply with three lines only: the output path, whether comments were available to you (`коментарі: так` or `коментарі: ні`), and any source that was unavailable. Do not report credits: you spent none, and the skill recorded the credit when it made the request.

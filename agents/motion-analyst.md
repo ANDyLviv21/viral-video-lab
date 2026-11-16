@@ -18,7 +18,7 @@ Your request contains ABSOLUTE paths. Do not assume a working directory and do n
 - `analysis/<nn>-frames/watch-answer.md`, when the skill hands you one: the answers to the `/watch` question block for this video. On the `gemini` engine the answer was produced by Google's video model, which HEARD the audio, so its Q4 answer is your evidence for column 12 `Звуковий акцент`. On the `local` engine it carries no sound. A section that says `немає відповіді на цьому рушії` gives you nothing for that question. If no path is given, work without it
 - the format reference `motion-table.md` (the plugin file `references/motion-table.md`)
 - the output file to write, `analysis/<nn>-motion.md`
-- optional: the user's `profile.md`, as an absolute path supplied by the orchestrating skill. If no path is given or the file cannot be read, write the report in Ukrainian
+- optional: the run's `direction-profile.md` and the user's base `profile.md`, as absolute paths supplied by the orchestrating skill. The run's `direction-profile.md` is the PRIMARY profile and the base `profile.md` is the fallback; the report language always comes from the base profile. The full rule is in `references/direction-profile.md`, section `Precedence`, and is not repeated here. If no path is given or neither file can be read, write the report in Ukrainian
 
 Read the format reference first and follow it exactly.
 
@@ -41,6 +41,6 @@ Read the format reference first and follow it exactly.
 
 ## Output
 
-Write the output file in the language given in the `profile.md` whose path you were handed (Ukrainian if none was given or it is unreadable). The column headers and section headings are fixed and are written exactly as in the format reference, in this order: `t, с`, `Шот`, `Камера: рух`, `Камера: швидкість`, `Перехід`, `Motion-елементи`, `3D-об'єкти`, `UI-графіка`, `Текст`, `Поява тексту`, `Easing`, `Звуковий акцент`, `Як відтворити`, `Кадр-доказ`.
+Write the output file in the language given in the base `profile.md` whose path you were handed (Ukrainian if none was given or it is unreadable). The column headers and section headings are fixed and are written exactly as in the format reference, in this order: `t, с`, `Шот`, `Камера: рух`, `Камера: швидкість`, `Перехід`, `Motion-елементи`, `3D-об'єкти`, `UI-графіка`, `Текст`, `Поява тексту`, `Easing`, `Звуковий акцент`, `Як відтворити`, `Кадр-доказ`.
 
 Finish by checking that the file has one row per second, 14 columns in every row and the three sections. Reply with the output path and the number of rows only.

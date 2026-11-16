@@ -59,15 +59,30 @@ Then give the user the three routes, with what each costs them:
 
 The key itself: it lives in `/watch`'s own private config file, the `.env` inside the `watch` folder of the user's `~/.config`, and `/watch`'s setup writes it there. Never print it, never echo it, never put it in a command line, never template it into a file and never ask for it in chat. If it is missing, `gemini_key_present` is false: say that the key is missing, point at https://aistudio.google.com/apikey and at `setup.py --engine gemini`, and let `/watch`'s own setup handle the rest.
 
-## 4. Check the profile
+## 4. Check the profile, both layers
+
+The profile has TWO layers, and the user is told so in one or two lines before anything is written. Say it like this, in the report language:
+
+```
+Профіль із двох шарів. Базовий профіль (profile.md) — те, що не змінюється: персонаж, манера, мова звітів, чого уникати, пріоритет платформ. Профіль напряму створюється заново під кожен запуск із теми, яку ти назвеш: аудиторія цього напряму, мова пошуку, тон, норми ніші, платформи й чого уникати саме тут.
+Профіль напряму успадковує базовий і перекриває його, де вони розходяться; мова звітів завжди береться з базового.
+```
+
+The two layers and the precedence between them are described once, in `../../references/direction-profile.md`. Read it before this step.
+
+### 4.1 The base profile
 
 Look for `profile.md` in the user's current working folder (not inside the plugin). If it exists, read it and take the report language from the "Мова звітів" section (default Ukrainian).
 
-If it is missing, offer to create it from `../../config/profile.example.md`. With the user's agreement, ask about the sections one by one (Тематика, Аудиторія, Стиль, Персонаж, Платформи, Мова звітів, Чого уникати), then write `profile.md` into the working folder.
+If it is missing, offer to create it from `../../config/profile.example.md`. With the user's agreement, ask only about the things that do NOT change between directions — Персонаж, Манера, Платформи (with their priority), Мова звітів, Чого уникати — one at a time, then write `profile.md` into the working folder. Do not ask here about the topic, the audience, the style or the norms of a niche: those belong to a direction profile and are proposed per run by `viral-scout`.
+
+### 4.2 Offer a first direction profile
+
+Then offer, once, to prepare a first direction profile for a direction the user names, so the first run does not start from zero. Only with their agreement: ask for the direction, fill every section of the template in `../../references/direction-profile.md` yourself from that direction and the base profile, show the whole filled profile, take one `так` or their corrections, and write the confirmed text to `library/profiles/<slug>.md` in the working folder (slug: lowercase ASCII with hyphens; create `library/profiles/` if needed). Nothing goes into a run folder here: there is no run yet, and `viral-scout` picks the saved profile up at its brief step. If the user declines, say that `viral-scout` will propose one at the start of the first run anyway.
 
 ## 5. Report
 
-Write the report in the language from `profile.md` (default Ukrainian). Group it as: required and missing, optional and missing, checked manually (connectors, credits), the `/watch` engine and what it means for the sound columns, profile status. For each missing item say what it is, which stages it affects, and give its `install_hint`.
+Write the report in the language from the base `profile.md` (default Ukrainian). Group it as: required and missing, optional and missing, checked manually (connectors, credits), the `/watch` engine and what it means for the sound columns, profile status (the base profile, and which direction profiles are saved in `library/profiles/`). For each missing item say what it is, which stages it affects, and give its `install_hint`.
 
 ## Rules
 

@@ -19,7 +19,9 @@ Hard rule about the ceiling: `limits.generation` in `../../config/sources.json` 
 
 ## 1. Profile
 
-Look for `profile.md` in the user's current working folder (not inside the plugin). If it is missing, send the user to the `viral-lab-setup` skill and stop. Otherwise read it and take the report language from the "Мова звітів" section (default Ukrainian).
+Look for the BASE `profile.md` in the user's current working folder (not inside the plugin). If it is missing, send the user to the `viral-lab-setup` skill and stop. Otherwise read it and take the report language from the "Мова звітів" section (default Ukrainian): the report language always comes from the base profile.
+
+Then read the run's `direction-profile.md` if the run folder has one (`run.json.direction_profile` says whether it does). It is the PRIMARY profile for everything else — audience, search language, tone, the norms of the niche, the platforms of this direction, what to avoid in it — and the base profile is the fallback. The precedence rule is written once, in `../../references/direction-profile.md`; read it and follow it, and hand both absolute paths to every agent that needs a profile. A run without a direction profile uses the base profile alone and the report says so in one line.
 
 ## 2. Run folder and the stage check
 
@@ -34,7 +36,7 @@ This stage uses no ScrapeCreators and no vidIQ credits. Everything is built loca
 
 ## 4. Synthesis (stage 6)
 
-Start the `synthesizer` agent. Give it ABSOLUTE paths to: the run folder, `approved.md`, every `analysis/<nn>-motion.md` and `analysis/<nn>-marketing.md`, `review.md`, `profile.md`, `library/patterns.md` (only if it exists; say so when it does not), `references/combo-brief.md`, `references/recreation-engines.md`, and the two output files `playbook.md` and `combo-brief.md` in the run folder.
+Start the `synthesizer` agent. Give it ABSOLUTE paths to: the run folder, `approved.md`, every `analysis/<nn>-motion.md` and `analysis/<nn>-marketing.md`, `review.md`, the run's `direction-profile.md` (when it exists), the base `profile.md`, `library/patterns.md` (only if it exists; say so when it does not), `references/combo-brief.md`, `references/recreation-engines.md`, and the two output files `playbook.md` and `combo-brief.md` in the run folder.
 
 Check the result: `playbook.md` has the six headings of `../../references/combo-brief.md` in order and every item under `Спільні закономірності` cites at least two different videos; `combo-brief.md` has 2 or 3 variants, each with the eight headings in order, a `Посекундний каркас` of at most 90 seconds, and nothing that reuses a reference's character, music, footage or text. If a check fails, show the user what failed and run the agent once more with the failure named. Then set `run.json.stage` to `synthesis`. Write the stage only after both files exist.
 
@@ -60,7 +62,7 @@ Agents do not call third-party skills (method B in `run-layout.md`). Do these st
 
 ### 6.2 The director
 
-Start the `recreation-director` agent. Give it ABSOLUTE paths to: `choice.md`, `combo-brief.md`, `playbook.md`, `profile.md`, the `analysis/<nn>-motion.md` files the chosen variant draws on, `references/motion-table.md`, `references/safe-zones.md`, `references/recreation-engines.md`, `references/combo-brief.md`, `recreation/engine-notes.md`, `recreation/assets/` (if it exists), `recreation/stop3.md` (if it exists), the output paths `recreation/storyboard.md`, `recreation/project/`, `recreation/draft.mp4`, `recreation/paid-request.md`, and the line `round: first`, `round: after-assets` or `round: fixes`.
+Start the `recreation-director` agent. Give it ABSOLUTE paths to: `choice.md`, `combo-brief.md`, `playbook.md`, the run's `direction-profile.md` (when it exists), the base `profile.md`, the `analysis/<nn>-motion.md` files the chosen variant draws on, `references/motion-table.md`, `references/safe-zones.md`, `references/recreation-engines.md`, `references/combo-brief.md`, `recreation/engine-notes.md`, `recreation/assets/` (if it exists), `recreation/stop3.md` (if it exists), the output paths `recreation/storyboard.md`, `recreation/project/`, `recreation/draft.mp4`, `recreation/paid-request.md`, and the line `round: first`, `round: after-assets` or `round: fixes`.
 
 Read its reply. It ends in one of two ways: `платні кроки: немає` (go to step 6.4) or `СТОП 3: потрібна згода` with the path of `recreation/paid-request.md` (go to step 6.3). Never skip the reply and never assume which one it was.
 
@@ -94,7 +96,7 @@ Counter: `run.json.qc_rounds` (0 at the start; add the field if it is missing). 
 
 ### 7.2 The quality controller
 
-Start `quality-controller`. Give it ABSOLUTE paths to: `recreation/draft-frames/`, its transcript, its `watch-answer.md` (saying in the request which engine produced it, so the agent knows whether it holds any sound evidence) and its `ffprobe.txt` (not `recreation/draft.mp4`: the agent has no `Bash` and nothing to do with the .mp4), `recreation/storyboard.md`, `choice.md`, `combo-brief.md`, `playbook.md`, the `analysis/<nn>-motion.md`, `analysis/<nn>-marketing.md` and `analysis/<nn>-frames/` of the videos the variant draws on, `recreation/replica-qc.md` (only if it exists), `recreation/stop3.md` (only if it exists), `references/safe-zones.md`, `profile.md`, and the output `qc.md`.
+Start `quality-controller`. Give it ABSOLUTE paths to: `recreation/draft-frames/`, its transcript, its `watch-answer.md` (saying in the request which engine produced it, so the agent knows whether it holds any sound evidence) and its `ffprobe.txt` (not `recreation/draft.mp4`: the agent has no `Bash` and nothing to do with the .mp4), `recreation/storyboard.md`, `choice.md`, `combo-brief.md`, `playbook.md`, the `analysis/<nn>-motion.md`, `analysis/<nn>-marketing.md` and `analysis/<nn>-frames/` of the videos the variant draws on, `recreation/replica-qc.md` (only if it exists), `recreation/stop3.md` (only if it exists), `references/safe-zones.md`, the run's `direction-profile.md` (when it exists), the base `profile.md`, and the output `qc.md`.
 
 Check that `qc.md` has the five headings `Відповідність сценарію`, `Порівняння з референсами`, `Безпечні зони`, `Артефакти`, `Вердикт` in this order and that the verdict is exactly `готово` or `доопрацювати`.
 
@@ -103,7 +105,7 @@ Check that `qc.md` has the five headings `Відповідність сцена�
 Use the existing `review-council` agent as it is, with the label `власний`; do not write another council. Work in the folder `qc-own/` of the run folder, so the references' `review-*.md` files are never overwritten.
 
 1. Create `qc-own/inputs/`. Write `social.md` and `ad-creative.md` there, each with the single line `джерело недоступне` (these two analyses are about the references; they are not run on the own video).
-2. In parallel start `motion-analyst` (the frames folder `recreation/draft-frames/`, its transcript, its `watch-answer.md`, its `ffprobe.txt`, `references/motion-table.md`, the output `qc-own/own-motion.md`, `profile.md`) and `hook-marketer` (the run folder and the number `власний`, a line `власний | platforms | — | — | власний ролик`, the frames folder, the transcript and `watch-answer.md`, `trends.md` and `trends-input/hooks.md` if they exist, `qc-own/inputs/`, `references/marketing-checklist.md`, `references/safe-zones.md`, `config/sources.json`, the output `qc-own/own-marketing.md`, `profile.md`; make no comments request and pass no `comments.json`, because the own video has no comments, and the agent holds no connector anyway). Check that `own-marketing.md` has the eight heading lines of `../../references/marketing-checklist.md`.
+2. In parallel start `motion-analyst` (the frames folder `recreation/draft-frames/`, its transcript, its `watch-answer.md`, its `ffprobe.txt`, `references/motion-table.md`, the output `qc-own/own-motion.md`, the run's `direction-profile.md` (when it exists) and the base `profile.md`) and `hook-marketer` (the run folder and the number `власний`, a line `власний | platforms | — | — | власний ролик`, the frames folder, the transcript and `watch-answer.md`, `trends.md` and `trends-input/hooks.md` if they exist, `qc-own/inputs/`, `references/marketing-checklist.md`, `references/safe-zones.md`, `config/sources.json`, the output `qc-own/own-marketing.md`, the run's `direction-profile.md` (when it exists) and the base `profile.md`; make no comments request and pass no `comments.json`, because the own video has no comments, and the agent holds no connector anyway). Check that `own-marketing.md` has the eight heading lines of `../../references/marketing-checklist.md`.
 3. Start `review-council` three times in parallel, once per role (`Маркетолог`, `Таргетолог`, `SMM-фахівець`), then a fourth time to consolidate, exactly as in step 6 of `viral-breakdown`: `mode: role` and `role: <name>`, or `mode: consolidate`; the label is `власний`; the files to judge are `qc-own/own-motion.md`, `qc-own/own-marketing.md` and the frames folder; the outputs are `qc-own/review-marketer.md`, `qc-own/review-targetolog.md`, `qc-own/review-smm.md` and `qc-own/review.md`; give a role run no other role's file. Check that `qc-own/review.md` has the seven columns of `../../references/council-roles.md` and that every severity is `критично`, `важливо` or `дрібниця`.
 
 ### 7.4 Decision
