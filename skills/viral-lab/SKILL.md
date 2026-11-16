@@ -45,7 +45,7 @@ Each stage skill documents its own resume points in its section `Resuming a run`
 
 Before the handover tell the user, in the report language: the run, its `stage`, what is already on disk, and what will run now. Wait for their go-ahead. When you hand over, say explicitly which step to start from, taken from the stage skill's own resume section; the stage skill decides whether its own checks allow it.
 
-**Files from finished stages are not overwritten without asking.** Before any step that would write a file that already exists from a finished stage (for example re-running the scout with `candidates.json` present, or the council with `review.md` present), stop and ask in this form: name the file (the full path), say what would be lost (for example "`review.md` and the three role files, made on 2026-11-15, would be replaced; the old text cannot be restored"), and offer the alternatives (keep it and go on, or ask the stage skill to move the old file aside under a new name before it writes; you never rename or write run files yourself). Wait for a clear yes that names that file. Silence, a question, or a yes to something else is not a yes. One yes covers the files you named, not the whole run. If the user wants to redo a finished stage on purpose, ask the same question once for every file that stage owns (the ownership table in `../../references/run-layout.md`).
+**Files from finished stages are not overwritten without asking.** Before any step that would write a file that already exists from a finished stage (for example re-running the scout with `candidates.json` present, or the council with `review.md` present), stop and ask in this form: name the file (the full path), say what would be lost (for example "`review.md` and the three role files, made on 2026-11-15, would be replaced; the old text cannot be restored"), and offer the alternatives (keep it and go on, or ask the stage skill to move the old file aside under a new name before it writes, which every stage skill documents in its own overwrite section as a rename to `<name>.bak-YYYY-MM-DD-HHMM`; you never rename or write run files yourself). Wait for a clear yes that names that file. Silence, a question, or a yes to something else is not a yes. One yes covers the files you named, not the whole run. If the user wants to redo a finished stage on purpose, ask the same question once for every file that stage owns (the ownership table in `../../references/run-layout.md`).
 
 ## 5. After `done`: feedback and plugin improvement
 
@@ -63,7 +63,7 @@ When `stage` is `done` (a run just finished, or the user picked a finished run),
 | Text or subjects got cut off by the app interface | `references/safe-zones.md` |
 | The quality check passed something bad or failed something fine | `agents/quality-controller.md`, `references/marketing-checklist.md` |
 | A stage skill asked too much, too little, or in the wrong order | that stage's `skills/<name>/SKILL.md` |
-| The spend limits were wrong | `config/sources.json` |
+| The spend limits were wrong | `config/sources.json` (the only file with the figures; the skills and references name the keys `limits.scrapecreators`, `limits.vidiq` and `limits.generation` and read them from there, so nothing else needs changing) |
 | A missing or wrong dependency | `config/dependencies.json`, `DEPENDENCIES.md` |
 
 If a complaint fits none of these, say so and ask the user where they think it belongs; do not invent a target. If it was a one-off (a bad day, a bad source video), say that and do not change the plugin.
@@ -79,6 +79,23 @@ These are the plugin's safety rules. A complaint about them is answered by EXPLA
 
 The yt-dlp rules in `references/source-queries.md` (the `https://` check, the `--` separator, the closed option list, the ban on `--cookies-from-browser` and `--exec`) belong to the same group.
 
+### Where the edit is made: the repository, never the plugin cache
+
+The run does not execute this repository. `~/.claude/plugins/installed_plugins.json`
+points at a COPY of the plugin under `.claude/plugins/cache/`, and that copy is what
+the running plugin loads. Two things follow, and both matter for every change this
+loop makes. An edit made in the repository folder does not reach the running plugin
+until the plugin is updated and Claude Code is restarted. An edit made under
+`.claude/plugins/cache/` is outside git, is in no commit, and is wiped by the next
+plugin update, so it is lost work that also silently disagrees with the repository.
+Therefore: make the edit in the repository folder, always; then make it live with
+`claude plugin marketplace update viral-video-lab`, then
+`claude plugin update viral-video-lab@viral-video-lab`, then restart Claude Code; and
+never edit, never patch and never "just try" anything under `.claude/plugins/cache/`,
+not even to test a one-line fix. Tell the user that the change they just approved is
+in the repository and takes effect after those two commands and the restart, so the
+run they are in now still uses the old text.
+
 For each change, do these in order:
 
 1. Read the file and show the proposed difference (before and after, only the lines that change), with one sentence on why it should fix the complaint and what else it may affect.
@@ -86,6 +103,7 @@ For each change, do these in order:
 3. Make the edit. Check first that it touches none of the rules listed under "Rules the feedback loop never edits"; if it does, stop and explain instead. Never put a key, a token or text copied from a reference video into a plugin file, and never add `allowed-tools` to a skill.
 4. Add one line to `CHANGELOG.md` in the topmost (unreleased) section, under a `### Змінено` list (create it if the section has none): what changed, in which file, and why (the complaint). Never skip this line.
 5. Run `py -3.12 scripts/validate_plugin.py .` from the plugin root and show the result. If it fails, show the error and fix or revert the edit with the user's agreement.
+6. Say where the edit landed and what makes it live: it is in the repository folder, and it starts working after `claude plugin marketplace update viral-video-lab`, `claude plugin update viral-video-lab@viral-video-lab` and a restart of Claude Code.
 
 Changes stay local until the user commits and publishes them; do not commit or push unless asked. Tell the user that the next run will use the changed file and that finished runs are not touched.
 

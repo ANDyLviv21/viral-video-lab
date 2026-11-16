@@ -23,7 +23,7 @@ One row per second of the video (`t, с` = 0, 1, 2 ...). A cell with nothing to 
 | 11 | `Easing` | Observed motion curve: linear, ease-in, ease-out, ease-in-out, overshoot or bounce, snap. |
 | 12 | `Звуковий акцент` | Sound event on this second (hit, whoosh, riser, beat drop, voice word, silence), taken from the transcript or an audio cue, not guessed from the picture. |
 | 13 | `Як відтворити` | One line for a motion designer: how to rebuild it (tool-agnostic: keyframes, durations in frames at 30 fps, easing). |
-| 14 | `Кадр-доказ` | The frame that shows this row: frame file name (for example `f_0004.jpg`) or timestamp (`00:04.0`). Required in every row. |
+| 14 | `Кадр-доказ` | The frame that shows this row: frame file name as `/watch` writes it (for example `frame_0004.jpg`, or `cue_0004.jpg` for a pinned timestamp) or timestamp (`00:04.0`). Required in every row. |
 
 Rules for the table:
 
@@ -45,5 +45,5 @@ Exactly these three headings (level 2), in this order.
 ```
 | t, с | Шот | Камера: рух | Камера: швидкість | Перехід | Motion-елементи | 3D-об'єкти | UI-графіка | Текст | Поява тексту | Easing | Звуковий акцент | Як відтворити | Кадр-доказ |
 |------|-----|-------------|-------------------|---------|-----------------|------------|------------|-------|--------------|--------|-----------------|---------------|------------|
-| 0 | 1: крупний план, продукт | push-in | повільна | — | спалах білого | — | — | "СТОП" | pop | ease-out | удар | scale 100 -> 108 за 30 кадрів, ease-out | f_0000.jpg |
+| 0 | 1: крупний план, продукт | push-in | повільна | — | спалах білого | — | — | "СТОП" | pop | ease-out | удар | scale 100 -> 108 за 30 кадрів, ease-out | frame_0001.jpg |
 ```

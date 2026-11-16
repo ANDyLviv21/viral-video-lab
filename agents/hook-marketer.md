@@ -17,7 +17,7 @@ Your request contains ABSOLUTE paths. Do not assume a working directory and do n
 - the run folder (for `run.json`, read only) and the video number `nn`
 - the line for this video from `approved.md` (platform, url, author, reason)
 - the frames folder `analysis/<nn>-frames/` and the transcript file inside it (the orchestrating skill ran `/watch`)
-- `trends.md` (it may not exist in a single-link run) and the trend material file about hooks and subtitles (`trends-input/Хуки й субтитри.md`)
+- `trends.md` (it may not exist in a single-link run) and the trend material file about hooks and subtitles (`trends-input/hooks.md`, whose first line is the Ukrainian section name `Хуки й субтитри`)
 - the files the orchestrating skill prepared from other skills, in `analysis/<nn>-inputs/`: `social.md` (from `/social`) and `ad-creative.md` (from `/ad-creative`). A file that says `джерело недоступне` means that skill was not installed
 - the plugin files `references/marketing-checklist.md` and `references/safe-zones.md`, and `config/sources.json`
 - the output file to write, `analysis/<nn>-marketing.md`

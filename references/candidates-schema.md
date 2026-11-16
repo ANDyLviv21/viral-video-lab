@@ -22,7 +22,7 @@ Any metric may be `null` (unknown). `null` is not the same as `0`: a `null` metr
 
 | Field | Type | Notes |
 |-------|------|-------|
-| `id` | string | Platform video id. `(platform, id)` is the de-duplication key. |
+| `id` | string | Platform video id, canonical: the video's own id taken from the URL path (the `/reel/<code>/` code for Instagram, the `/video/<digits>` id for TikTok, the `v=` or `/shorts/<id>` id for YouTube), not the source's internal record id. `(platform, id)` is the first de-duplication key; the canonical URL is the second. |
 | `platform` | `instagram` / `tiktok` / `youtube` | Percentile ranks are computed per platform. |
 | `url` | string | Link to the video. |
 | `author` | string | Author handle; capped by `max_per_author`. |
@@ -38,7 +38,7 @@ Any metric may be `null` (unknown). `null` is not the same as `0`: a `null` metr
 | `outlier_score` | number | Source-provided outlier multiplier; highest-priority virality signal. |
 | `source` | `vidiq` / `scrapecreators` | Where the record came from. |
 
-When the same `(platform, id)` appears twice, the record with more non-null fields wins (first one on a tie).
+When the same `(platform, id)` appears twice, the record with more non-null fields wins (first one on a tie). `rank.py` then repeats the same merge over the canonical URL (host without `www.`, path without a trailing slash, query string dropped), because vidIQ and ScrapeCreators do not return the same id string for the same Instagram or TikTok video, and the id pass alone lets one video into the top list twice.
 
 ## Example
 

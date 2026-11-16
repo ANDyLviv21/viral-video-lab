@@ -4,6 +4,17 @@
 
 ## 0.1.0 (не випущено)
 
+### Змінено
+
+- `references/run-layout.md`: передачу `/watch` описано так, як скіл справді працює (`--out-dir` створює випадкову папку `watch-*`, кадри звуться `frame_0001.jpg`, транскрипт йде в stdout і зберігається скілом); `viral-breakdown` і `viral-recreate` тепер посилаються на цей один опис.
+- `scripts/rank.py`: додано `--period-days` і `--max-duration-sec`, другий прохід дедуплікації за URL і відкидання `NaN`/`Infinity`; `top-selector` передає `period_days` із `run.json`.
+- `references/source-queries.md`: рядок про авторів розбито на три з точними назвами інструментів і параметрами.
+- `skills/viral-breakdown/SKILL.md`: відео з готовим `comments.json` виключається до підрахунку N, і файл додано до захисту від перезапису (перезапис коштує кредит).
+- `skills/viral-lab/SKILL.md` і `README.md`: правки робляться в репозиторії, а не в `.claude/plugins/cache/`; живими їх робить оновлення плагіна й перезапуск.
+- `references/recreation-engines.md`: `/higgsfield` тільки пише промпти, генерацію робить користувач сам, тому `limits.generation` там орієнтирний; `--engine local` не виключає хмарного Whisper, тому додано явний локальний вибір.
+- Резервні відео зберігаються як `reserve-<k>.mp4`, а файли `trends-input/` — як `topic.md`, `hooks.md`, `editing.md`.
+- Числа лімітів у прозі замінено на назви ключів: цифри живуть у `config/sources.json` і `README.md`.
+
 ### Безпека
 
 - Платні виклики конекторів перенесено з агентів `trend-scout` і `hook-marketer` у скіли `viral-scout` і `viral-breakdown`; обидва агенти дістали `tools: Read, Write, Glob, Grep` і більше не мають доступу до конекторів сесії. Сирі відповіді лягають у `sources-raw/` і `analysis/<nn>-inputs/comments.json`.

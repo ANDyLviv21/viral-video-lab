@@ -22,7 +22,7 @@ The step is chosen from `stage` in `run.json`, read at this moment, never from w
 - `select`: step 5, Stop 1. Show `top5.md` and ask; do not run the agents again.
 - `approve` or later: this skill is finished. Send the user to `viral-breakdown` (or `viral-recreate` from `review` on).
 
-Files from finished stages are not overwritten without asking first. Before a step would write a file that already exists (for example `candidates.json`, `trends.md`, `ranked.json`, `top5.md`, `approved.md`, or a video in `videos/`), name the file, say what would be lost, and wait for a clear yes that names it. Silence or a yes to something else is not a yes.
+Files from finished stages are not overwritten without asking first. Before a step would write a file that already exists (for example `candidates.json`, `trends.md`, `ranked.json`, `top5.md`, `approved.md`, or a video in `videos/`), name the file, say what would be lost, and wait for a clear yes that names it. Silence or a yes to something else is not a yes. If the user would rather keep the old text, move the existing file aside yourself before writing: rename it to `<name>.bak-YYYY-MM-DD-HHMM` in the same folder, say the new name, and then write the new file. Never delete it and never move a file aside without the user asking for it.
 
 ## 1. Profile
 
@@ -40,7 +40,7 @@ Create `runs/<YYYY-MM-DD>-<slug>/` in the working folder (slug from the topic, l
 
 ## 3. Expected spend, and the consent that unlocks it
 
-Compute the expected CREDITS from `../../references/source-queries.md` for the chosen platforms: vidIQ 2 calls of 5 credits each = 10 credits, ScrapeCreators 1 credit per search page plus 1 credit per author lookup (up to `author_median_lookups_max`). The per-run limits are in `../../config/sources.json` and are also credits (ScrapeCreators 25, vidIQ 10). Everything you say about these numbers says "credits", never "calls".
+Compute the expected CREDITS from `../../references/source-queries.md` for the chosen platforms: vidIQ 2 calls of 5 credits each = 10 credits, ScrapeCreators 1 credit per search page plus 1 credit per author lookup (up to `author_median_lookups_max`). The per-run limits are in `../../config/sources.json` and are also credits: read `limits.scrapecreators` and `limits.vidiq` from that file and show those figures. Never quote a limit from memory or from this document: the file is the only place the numbers live. Everything you say about these numbers says "credits", never "calls".
 
 Show, in the report language: each source, the credits it will cost, the grand total in credits, what is already recorded in `run.json.credits` and therefore already spent, and what is left of each limit.
 
@@ -64,7 +64,7 @@ Without a yes, do not make a single paid call and do not start the scout.
 
 ## 4. Trend material, the searches, then the agents
 
-1. Run `/last30days` in this conversation, one query per section, and write each answer to `<run>/trends-input/<section>.md` with the section names `Тема`, `Хуки й субтитри`, `Монтаж і motion` (queries: what is trending on the topic; which hooks and subtitle styles work in short videos on the topic; which editing and motion styles work). If `/last30days` is not installed, write the line `джерело недоступне` as the content of each file. Its unknown cost was already shown to the user in the spend line of step 3.
+1. Run `/last30days` in this conversation, one query per section, and write each answer to `<run>/trends-input/` under an ASCII file name, with the Ukrainian section name as the first line of the file: `topic.md` for `Тема`, `hooks.md` for `Хуки й субтитри`, `editing.md` for `Монтаж і motion`. File names stay ASCII with no spaces, like the council role files; the Ukrainian name lives inside the file (queries: what is trending on the topic; which hooks and subtitle styles work in short videos on the topic; which editing and motion styles work). If `/last30days` is not installed, write the line `джерело недоступне` as the content of each file. Its unknown cost was already shown to the user in the spend line of step 3.
 2. Make the paid searches YOURSELF, here, in this conversation. The `trend-scout` agent has no connector and never calls one. For each query in `../../references/source-queries.md`, for the platforms of this run, in this order:
    - Find the connector tool by the END of its name (the prefix differs on every PC) and load it first if it is deferred.
    - Check the remaining allowance: the limit in `config/sources.json` minus `run.json.credits` read at this moment. If the call would exceed it, skip the call, note it, and do not make it.
@@ -86,7 +86,7 @@ Show `top5.md` (the top list with the lines `не завантажено`, and t
 
 Do not go on without the user's answer.
 
-For a video from the reserve or a link from the user that is not downloaded yet, download it into `<run>/videos/` under a name that cannot collide with the top videos: a reserve video keeps its reserve number from `top5.md` (`06.mp4` and up), a manual link is saved as `manual-<k>.mp4` with k starting at 1. Never write `01.mp4` to `05.mp4` here. The renumbering below takes files from these names. Download with `yt-dlp` following the download rules in `../../references/source-queries.md` in full: the URL must start with the literal `https://` and hold no whitespace, quote or backtick (otherwise refuse it and tell the user), `--` goes immediately before the URL as the last thing on the command line, and only the options on the closed list in that file are passed — never `--cookies-from-browser`, never `--exec`. Then check with `ffprobe` that it is vertical and up to 90 seconds. A video the user added by link is marked `додано вручну` in its reason.
+For a video from the reserve or a link from the user that is not downloaded yet, download it into `<run>/videos/` under a name that cannot collide with the top videos: a reserve video is saved as `reserve-<k>.mp4`, where `k` is its position in the reserve list of `top5.md` (the first reserve entry is `reserve-1.mp4`), and a manual link as `manual-<k>.mp4` with k starting at 1. Never give a reserve video a bare number: `rank.py` numbers the reserve from `len(top) + 1`, so with three survivors its first entry is printed as `04` and `04.mp4` would collide with a top slot. Never write `01.mp4` to `05.mp4` here. The renumbering below takes files from these names. Download with `yt-dlp` following the download rules in `../../references/source-queries.md` in full: the URL must start with the literal `https://` and hold no whitespace, quote or backtick (otherwise refuse it and tell the user), `--` goes immediately before the URL as the last thing on the command line, and only the options on the closed list in that file are passed — never `--cookies-from-browser`, never `--exec`. Then check with `ffprobe` that it is vertical and up to 90 seconds. A video the user added by link is marked `додано вручну` in its reason.
 
 A video that was not downloaded cannot be approved: tell the user and offer the next reserve video.
 

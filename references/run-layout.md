@@ -10,8 +10,9 @@ runs/<YYYY-MM-DD>-<slug>/
   spend-consent.md                    one line per spend decision of stages 1 and 4
   sources-raw/<source>-<label>.json   raw answers of the paid searches, written by the skill
   sources-raw/index.md                one line per attempted call: source, tool, query, credits, file, ok or failed
-  trends-input/<section>.md           one file per trends.md section, from /last30days
+  trends-input/topic.md  trends-input/hooks.md  trends-input/editing.md   one file per trends.md section, from /last30days
   videos/<nn>.mp4                     nn = top rank before approval, approved.md order after Stop 1
+  videos/reserve-<k>.mp4  videos/manual-<k>.mp4   reserve videos and user links, before renumbering
   videos/unused/                      videos not approved at Stop 1
   analysis/<nn>-motion.md  analysis/<nn>-marketing.md  analysis/<nn>-frames/
   analysis/<nn>-frames/ffprobe.txt     duration, frame rate and size of the video, measured by the skill
@@ -46,7 +47,7 @@ profile.md
 
 Stage 7 and 8 add two optional fields, written by the skill only: `qc_rounds` (number of fix rounds after the first quality check, 0 at the start) and `credits.generation` (an object keyed by tool name with the ACTUAL spend of paid generations, for example `{"higgsfield": 12}`, created on the first paid generation).
 
-`credits.scrapecreators` and `credits.vidiq` are CREDITS, never numbers of calls: one vidIQ outlier search is 5 credits, one ScrapeCreators call is 1 credit. The limits they are compared against (`limits` in `config/sources.json`) are credits too, and every figure shown to the user is said in credits. `limits.generation` is the per-run ceiling for paid generation, in the generator's own units summed over the keys of `credits.generation`.
+`credits.scrapecreators` and `credits.vidiq` are CREDITS, never numbers of calls: one vidIQ outlier search is 5 credits, one ScrapeCreators call is 1 credit. The limits they are compared against (`limits` in `config/sources.json`) are credits too, and every figure shown to the user is said in credits. `limits.generation` is the per-run ceiling for paid generation, in the generator's own units summed over the keys of `credits.generation`. When the generation is run by hand on a web platform (`/higgsfield` only writes prompts; see `recreation-engines.md`), the plugin cannot measure the spend: `credits.generation` then records what the user reports and the ceiling is ADVISORY, a figure shown at Stop 3. It is enforceable only for a generator connector called inside the session. Stop 3 itself is unchanged either way: nothing paid starts without an explicit yes to a shown sum.
 
 Spend is recorded as it happens: the skill adds a call's credits to `run.json` immediately after that call returns, before the next one, and never waits for the end of a stage or for an agent's self-report. A run interrupted mid-stage therefore shows on disk what it really spent, and a resume reads `credits` as it stands and subtracts it from the limits instead of starting from zero.
 
@@ -69,13 +70,14 @@ A stage writes its value after it finishes successfully, never before. A stage t
 | 3 prepare (before the agent runs) | skill | `analysis/<nn>-frames/` (frames and transcript, from `/watch`); `analysis/<nn>-frames/ffprobe.txt` (the skill runs `ffprobe` on `videos/<nn>.mp4`) |
 | 3 breakdown | `motion-analyst` | `analysis/<nn>-motion.md` |
 | 4 consent | skill | `spend-consent.md` (one appended line per decision; no comments request before a yes) |
-| 4 prepare (before the agent runs) | skill | `analysis/<nn>-inputs/social.md`, `analysis/<nn>-inputs/ad-creative.md` (from `/social` and `/ad-creative`); `analysis/<nn>-inputs/comments.json` (the one comments request per allowed video, made by the skill); `run.json.credits.scrapecreators` immediately after each comments request; `stage: breakdown` once all breakdown files exist |
+| 4 prepare (before the agent runs) | skill | `analysis/<nn>-inputs/social.md`, `analysis/<nn>-inputs/ad-creative.md` (from `/social` and `/ad-creative`); `analysis/<nn>-inputs/comments.json` (the one comments request per allowed video, made by the skill); `run.json.credits.scrapecreators` immediately after each comments request |
 | 4 breakdown | `hook-marketer` | `analysis/<nn>-marketing.md` (it reads no `-motion.md`: both agents run in parallel). It calls no connector and writes no `credits` |
+| 4 close | skill | `run.json.stage: breakdown` once all breakdown files of stages 3 and 4 exist |
 | 5 review | `review-council` | `review-marketer.md`, `review-targetolog.md`, `review-smm.md` (one run per role, each reads no other role's file), then `review.md` (consolidating run, reads the three role files) |
 | 5 close | skill | `run.json.stage: review` after `review.md` exists |
 | 6 synthesis | `synthesizer` | `playbook.md`, `combo-brief.md` |
-| Stop 2: user picks a combo variant | skill | `choice.md`, `run.json.stage: choose` |
 | 6 close | skill | `run.json.stage: synthesis` after `playbook.md` and `combo-brief.md` exist |
+| Stop 2: user picks a combo variant | skill | `choice.md`, `run.json.stage: choose` |
 | 7 prepare (before the agent runs) | skill | `recreation/engine-notes.md` (from the HyperFrames, Remotion, `/threejs`, `/video-editing`, `/video-prompting` skills); for a Blender variant, the local renders in `recreation/assets/` and `index.md` (the director has no Blender access) |
 | 7 inputs (read by `recreation-director`) | none | reads `choice.md`, `combo-brief.md`, `playbook.md`, `analysis/<nn>-motion.md`, `recreation/engine-notes.md`, `recreation/stop3.md`, `recreation/assets/`, and in `round: fixes` also `qc.md` and `qc-own/review.md` (see the exception in the rule below) |
 | Stop 3 (inside stage 7) | skill | `recreation/stop3.md`: one appended line per decision, yes or no, with what was shown, the sum, the date and time, and `відхилено: <item> -> заглушка` for each declined item. After a yes only: `recreation/assets/`, `recreation/assets/index.md`, the actual spend in `run.json.credits.generation` |
@@ -100,7 +102,7 @@ Why: `trend-scout` and `hook-marketer` read captions, descriptions, transcripts 
 
 `trends-input/<section>.md` follows the same method-B rule as `/watch` below: the skill runs `/last30days` in the main conversation and the agent only reads the files.
 
-`videos/` numbering: `top-selector` downloads before approval and numbers by top rank. At Stop 1 the skill renumbers to `approved.md` order, using temporary names so nothing is overwritten. Videos not approved are moved to `videos/unused/`, not deleted.
+`videos/` numbering: `top-selector` downloads before approval and numbers by top rank. A reserve video the user picks at Stop 1 is downloaded as `videos/reserve-<k>.mp4` with `k` its position in the reserve list of `top5.md`, and a user link as `videos/manual-<k>.mp4`: never a bare `<nn>.mp4`, which would collide with a top video. The reserve names carry no rank, so they do not contradict the numbers `rank.py` prints in `top5.md` when fewer than `top_n` videos survive. At Stop 1 the skill renumbers to `approved.md` order, using temporary names so nothing is overwritten. Videos not approved are moved to `videos/unused/`, not deleted.
 
 ## Rule: a stage reads only earlier files
 
@@ -118,10 +120,58 @@ Failed to authenticate: OAuth session expired and could not be refreshed
 
 Method B works whether or not agents can call skills, so it is the safe choice. Re-run the probe after signing in; if it shows that agents can use `Skill`, method A may be adopted later.
 
-Handoff for `motion-analyst`:
+### The `/watch` handoff (the one description; the skills point here)
 
-1. The orchestrating skill runs `/watch` on `videos/<nn>.mp4` with `--engine local` (`--detail token-burner` for videos up to 15 seconds; longer videos in segments of 10 to 15 seconds with `--start` and `--end`; `--resolution 1024` for small text), in the main conversation.
-2. It stores the frames in `analysis/<nn>-frames/` and the transcript in a text file, for example `analysis/<nn>-frames/transcript.txt`, and runs `ffprobe` on the video itself, writing the duration, frame rate and displayed size to `analysis/<nn>-frames/ffprobe.txt`.
-3. It starts the agent with absolute paths to: the frames folder, the transcript file, `analysis/<nn>-frames/ffprobe.txt` (not the video file: the agent has no `Bash`), `references/motion-table.md`, the output file `analysis/<nn>-motion.md`, and optionally the absolute path of the user's `profile.md` (if it is not passed or cannot be read, the agent writes the report in Ukrainian).
+This is the only description of how a frames folder is made. `viral-breakdown`
+and `viral-recreate` point at this section instead of repeating the flags, so
+there is one place to correct when the installed skill changes.
+
+The installed `/watch` (version 0.3.2) does NOT write a folder of frames and a
+transcript file where you ask it to. What it really does:
+
+- `--out-dir DIR` does not name the output directory. The script creates a
+  randomly named child `DIR/watch-XXXXXXXX/` and prints it on stderr as
+  `[watch] working dir: <path>`. The frames land in `<that child>/frames/` as
+  `frame_0001.jpg`, `frame_0002.jpg`, … (and `cue_0001.jpg` … for pinned
+  timestamps) — not `f_0004.jpg`.
+- The report, including the transcript, goes to **stdout** as markdown. No
+  transcript file is written at all.
+
+So the orchestrating skill does this, in the main conversation, for one video:
+
+1. Create the target folder (`analysis/<nn>-frames/`, or
+   `recreation/draft-frames/` for the own draft) and run `/watch` on the video
+   with `--out-dir <that folder>`, an explicit local engine and an explicit
+   local speech choice: `--engine local` together with `--whisper whisperx`, or
+   `--no-whisper` when no local model is installed. `--engine local` alone does
+   NOT rule out a cloud API: the installed skill still accepts
+   `--whisper groq|openai`, and a saved `auto` backend reaches for a Groq or
+   OpenAI key. Detail: `--detail token-burner` for videos up to 15 seconds;
+   longer videos in segments of 10 to 15 seconds with `--start` and `--end`;
+   `--resolution 1024` for small text.
+2. Read the `[watch] working dir: <path>` line on stderr to find the single
+   `watch-*` child of the target folder. Move the frame files out of its
+   `frames/` subfolder up into the target folder itself, so the frames sit
+   directly at `analysis/<nn>-frames/frame_0001.jpg` and so on, and then remove
+   the now empty `watch-*` child with its disposable `download/` and
+   `audio.mp3`. If there is more than one `watch-*` child (an earlier
+   interrupted attempt), say so and let the user decide rather than guessing.
+3. Write the transcript yourself: take the `## Transcript` section of the
+   report on stdout, without its fenced markers, and write it to
+   `analysis/<nn>-frames/transcript.txt` (or
+   `recreation/draft-frames/transcript.txt`). When the report says there is no
+   speech or no transcript, write that line as the whole content of the file.
+   The agent reads a file, never stdout.
+4. Run `ffprobe` on the video itself and write the duration, frame rate and
+   displayed size to `analysis/<nn>-frames/ffprobe.txt`, one `ключ: значення`
+   per line.
+5. Start the agent with absolute paths to: the frames folder, the transcript
+   file, `analysis/<nn>-frames/ffprobe.txt` (not the video file: the agent has
+   no `Bash`), `references/motion-table.md`, the output file
+   `analysis/<nn>-motion.md`, and optionally the absolute path of the user's
+   `profile.md` (if it is not passed or cannot be read, the agent writes the
+   report in Ukrainian).
+
+If `/watch` is not installed, the breakdown cannot run: tell the user and stop.
 
 Other agents follow the same rule: anything that needs a third-party skill is prepared by the orchestrating skill, and the agent receives only the resulting files.
