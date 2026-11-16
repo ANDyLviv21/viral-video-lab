@@ -30,8 +30,8 @@ Your request contains ABSOLUTE paths. Do not assume a working directory and do n
    `py -3.12 <rank.py> <run>/candidates.json --config <ranking.json> --out-json <run>/ranked.json --out-md <run>/top5.md`
 
    Exit 0 is success, also when fewer than 5 videos survive or some records were dropped. Exit 2 means the input or config is broken: stop and report the one stderr line.
-2. Read `ranked.json`. For each record in `top`, in order, number it `nn` = 01, 02, ... (its place in `top`) and download it with `yt-dlp` to the absolute path `<run>/videos/<nn>.mp4`. Follow the download rules in `source-queries.md`.
-3. After each download run `ffprobe` and check that the video is vertical (height greater than width) and not longer than 90 seconds. A video that fails the check counts as not downloaded, with the reason (`not vertical` or `longer than 90 s`); delete that file.
+2. Read `ranked.json`. For each record in `top`, in order, number it `nn` = 01, 02, ... (its place in `top`) and download it with `yt-dlp` to the absolute path `<run>/videos/<nn>.mp4`. Follow the download rules in `source-queries.md`, including the recommended format selector with `--merge-output-format mp4`.
+3. After each download run `ffprobe` and check that the video is vertical and not longer than 90 seconds. Read the display-matrix rotation first: at 90 or 270 degrees width and height are swapped, so judge verticality on the displayed size. A video that fails the check counts as not downloaded, with the reason (`not vertical` or `longer than 90 s`); delete that file.
 4. If a download fails for any reason, append a line `- не завантажено: <reason>` directly under the `- Посилання:` line of that video in `top5.md`. Continue with the remaining videos.
 5. Set `run.json.stage` to `select`. Write it only after `ranked.json` and `top5.md` exist.
 
