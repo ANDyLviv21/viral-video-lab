@@ -11,6 +11,8 @@ runs/<YYYY-MM-DD>-<slug>/
   videos/<nn>.mp4                     nn = top rank before approval, approved.md order after Stop 1
   videos/unused/                      videos not approved at Stop 1
   analysis/<nn>-motion.md  analysis/<nn>-marketing.md  analysis/<nn>-frames/
+  analysis/<nn>-inputs/social.md  analysis/<nn>-inputs/ad-creative.md   from /social and /ad-creative
+  review-маркетолог.md  review-таргетолог.md  review-smm-фахівець.md   one per council role
   review.md  playbook.md  combo-brief.md
   recreation/storyboard.md  recreation/project/  recreation/draft.mp4
   qc.md  final/<platform>.mp4
@@ -43,8 +45,10 @@ A stage writes its value after it finishes successfully, never before. A stage t
 | Stop 1: user approves references | skill | `approved.md`, `run.json.approved` and `stage: approve`, renumbered `videos/<nn>.mp4`, `videos/unused/` |
 | 3 prepare (before the agent runs) | skill | `analysis/<nn>-frames/` (frames and transcript, from `/watch`) |
 | 3 breakdown | `motion-analyst` | `analysis/<nn>-motion.md` |
-| 4 breakdown | `hook-marketer` | `analysis/<nn>-marketing.md` |
-| 5 review | `review-council` | `review.md` |
+| 4 prepare (before the agent runs) | skill | `analysis/<nn>-inputs/social.md`, `analysis/<nn>-inputs/ad-creative.md` (from `/social` and `/ad-creative`); `run.json.credits.scrapecreators` after each comments request; `stage: breakdown` once all breakdown files exist |
+| 4 breakdown | `hook-marketer` | `analysis/<nn>-marketing.md` (it reads no `-motion.md`: both agents run in parallel) |
+| 5 review | `review-council` | `review-<role>.md` (one run per role, each reads no other role's file), then `review.md` (consolidating run, reads the three role files) |
+| 5 close | skill | `run.json.stage: review` after `review.md` exists |
 | 6 synthesis | `synthesizer` | `playbook.md`, `combo-brief.md` |
 | Stop 2: user picks a combo variant | none | none |
 | 7 recreate | `recreation-director` | `recreation/` |
@@ -52,7 +56,7 @@ A stage writes its value after it finishes successfully, never before. A stage t
 
 Stop 3 is any point before a paid action, at any stage: the stage stops and asks the user first.
 
-`run.json` writers: `trend-scout` writes the actual credit spend and `stage: scout`; `top-selector` writes `stage: select`; the skill writes everything else (creation, `approved`, and the later stages).
+`run.json` writers: `trend-scout` writes the actual credit spend and `stage: scout`; `top-selector` writes `stage: select`; the skill writes everything else (creation, `approved`, and the later stages). `hook-marketer` makes at most one paid comments request per video and reports it in its reply; the skill adds it to `credits.scrapecreators`, so parallel agents never write `run.json`.
 
 `trends-input/<section>.md` follows the same method-B rule as `/watch` below: the skill runs `/last30days` in the main conversation and the agent only reads the files.
 
