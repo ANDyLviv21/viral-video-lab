@@ -4,5 +4,6 @@
   "description": "Finds viral short videos, ranks a top-5, analyses why they work and helps recreate the idea.",
   "author": {
     "name": "Андрій"
-  }
+  },
+  "license": "MIT"
 }
