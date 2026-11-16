@@ -89,7 +89,7 @@ Counter: `run.json.qc_rounds` (0 at the start; add the field if it is missing). 
 
 ### 7.2 The quality controller
 
-Start `quality-controller`. Give it ABSOLUTE paths to: `recreation/draft.mp4`, `recreation/draft-frames/` and its transcript, `recreation/storyboard.md`, `choice.md`, `combo-brief.md`, `playbook.md`, the `analysis/<nn>-motion.md`, `analysis/<nn>-marketing.md` and `analysis/<nn>-frames/` of the videos the variant draws on, `recreation/replica-qc.md` (only if it exists), `references/safe-zones.md`, `profile.md`, and the output `qc.md`.
+Start `quality-controller`. Give it ABSOLUTE paths to: `recreation/draft.mp4`, `recreation/draft-frames/` and its transcript, `recreation/storyboard.md`, `choice.md`, `combo-brief.md`, `playbook.md`, the `analysis/<nn>-motion.md`, `analysis/<nn>-marketing.md` and `analysis/<nn>-frames/` of the videos the variant draws on, `recreation/replica-qc.md` (only if it exists), `recreation/stop3.md` (only if it exists), `references/safe-zones.md`, `profile.md`, and the output `qc.md`.
 
 Check that `qc.md` has the five headings `Відповідність сценарію`, `Порівняння з референсами`, `Безпечні зони`, `Артефакти`, `Вердикт` in this order and that the verdict is exactly `готово` or `доопрацювати`.
 
@@ -103,7 +103,7 @@ Use the existing `review-council` agent as it is, with the label `власний
 
 ### 7.4 Decision
 
-Show the user the `Вердикт` of `qc.md` and `qc-own/review.md` in full, in the report language, and the paths.
+Show the user the `Вердикт` of `qc.md` and `qc-own/review.md` in full, in the report language, and the paths. Always relay with the verdict, word for word from the section `Порівняння з референсами` of `qc.md`, the line starting `Не перевірено:` and the line starting `Нагадування:` (music must be the user's own or properly licensed), so the user sees what QC did not check.
 
 - If the verdict is `готово` and `qc-own/review.md` has no `критично` row: set `run.json.stage` to `qc` and go to step 8.
 - Otherwise list the fixes from `qc.md` and every `критично` and `важливо` row of `qc-own/review.md`, say which fixes need a paid action, and ask whether to do another round. If the user says yes and `run.json.qc_rounds` is below 3, add 1 to `qc_rounds` and start the director again with `round: fixes`, giving it also the absolute paths of `qc.md` and `qc-own/review.md`; Stop 3 applies to any paid fix; then repeat steps 6.4 and 7 (the `qc-own/` and `recreation/draft-frames/` files are overwritten by the new round). After 3 rounds do not offer a fourth on your own: tell the user the limit is reached and go on only if the user asks for a fourth round explicitly, or accepts the draft as it is.
