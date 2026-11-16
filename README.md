@@ -63,7 +63,7 @@ viral-scout  ->  viral-breakdown  ->  viral-recreate
 
 ## Як оновлювати й допрацьовувати
 
-Оновлення: `/plugin marketplace update viral-video-lab`, далі `/plugin update viral-video-lab@viral-video-lab` (або перевстанови плагін). Що змінилося, дивись у [CHANGELOG.md](CHANGELOG.md).
+Оновлення з командного рядка: `claude plugin marketplace update viral-video-lab`, далі `claude plugin update viral-video-lab@viral-video-lab`. Щоб оновлення застосувалося, перезапусти Claude Code. Те саме можна зробити в сесії через `/plugin`, який відкриває керування плагінами. Що змінилося, дивись у [CHANGELOG.md](CHANGELOG.md).
 
 Допрацювання відбувається в самому конвеєрі. Коли запуск завершено (`stage: done`), `viral-lab` питає, що було не так, і за скаргою вказує файл плагіна, який за це відповідає. Слабкий топ-5: `config/ranking.json` або `references/source-queries.md`. Поверховий розбір: `references/marketing-checklist.md` чи відповідний агент. Відтворення, що виглядає не так: `references/combo-brief.md` або `references/recreation-engines.md`. Спершу показується різниця, правка вноситься лише після твоєї згоди, і в `CHANGELOG.md` додається рядок.
 

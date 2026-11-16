@@ -18,6 +18,7 @@ The step is chosen from `stage` in `run.json`, read at this moment, never from w
 - `approve` (Stop 1 done): start at step 3 (spend), then steps 4 and 5. If some `analysis/<nn>-motion.md` or `analysis/<nn>-marketing.md` already exist, redo only the videos that lack them.
 - `breakdown`: step 6, the council. Do not run steps 4 and 5 again.
 - `review`: this skill is finished. Show `review.md` (step 7) if the user asks, and send them to `viral-recreate`.
+- `synthesis` or later: this skill is finished; send the user to `viral-recreate`, which resumes from `stage`.
 - earlier than `approve` (`brief`, `scout`, `select`): do not start; send the user to `viral-scout`, as step 2 says.
 
 Files from finished stages are not overwritten without asking first. Before a step would write a file that already exists (for example `analysis/<nn>-motion.md`, `analysis/<nn>-marketing.md`, the `review-*.md` files, `review.md`, or `analysis/<nn>-frames/`), name the file, say what would be lost, and wait for a clear yes that names it. Silence or a yes to something else is not a yes.
