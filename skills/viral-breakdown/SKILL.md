@@ -30,7 +30,7 @@ Videos listed in `approved.md` are the only ones analysed. Never touch `videos/u
 
 ## 3. Expected spend
 
-Each approved video costs 1 ScrapeCreators credit for one comments request (made by `hook-marketer`). Compute: videos approved, credits already spent (`run.json.credits.scrapecreators`), the limit in `../../config/sources.json` (25 per run). Show the expected spend against the limit and WAIT for the user's agreement. If the remaining allowance is smaller than the number of videos, say so and tell the user which videos will have no comments request. Without the user's agreement, run the stage with the comments request switched off for every video. vidIQ is not used here.
+Each approved video costs 1 ScrapeCreators credit for one comments request (made by `hook-marketer`). Compute: videos approved, credits already spent (`run.json.credits.scrapecreators`), the limit in `../../config/sources.json` (25 per run). Show the expected spend against the limit and WAIT for the user's agreement. If the remaining allowance is smaller than the number of videos, say so and tell the user which videos will have no comments request. Without the user's agreement, run the stage with the comments request switched off for every video. vidIQ is not used here. For a single-link run add the `/last30days` call of step 4 to this line: it costs no credits (it is not a ScrapeCreators or vidIQ call), so write "/last30days: no credits".
 
 ## 4. Preparation in this conversation
 
@@ -46,11 +46,11 @@ For every approved video start `motion-analyst` and `hook-marketer` in parallel 
 
 `motion-analyst`: give it ABSOLUTE paths to the frames folder, the transcript file, the video file, `references/motion-table.md`, the output file `analysis/<nn>-motion.md` and the user's `profile.md`.
 
-`hook-marketer`: give it ABSOLUTE paths to the run folder and the number `nn`, the line for this video from `approved.md`, the frames folder and the transcript, `trends.md` (if it exists) and `trends-input/Хуки й субтитри.md`, `analysis/<nn>-inputs/`, `references/marketing-checklist.md`, `references/safe-zones.md`, `config/sources.json`, the output file `analysis/<nn>-marketing.md`, the user's `profile.md`, and a line saying whether its one comments request is allowed and how many credits are already spent.
+`hook-marketer`: give it ABSOLUTE paths to the run folder and the number `nn`, the line for this video from `approved.md`, the frames folder and the transcript, `trends.md` (only if it exists; say so when it does not, as in a single-link run) and `trends-input/Хуки й субтитри.md`, `analysis/<nn>-inputs/`, `references/marketing-checklist.md`, `references/safe-zones.md`, `config/sources.json`, the output file `analysis/<nn>-marketing.md`, the user's `profile.md`, and a line saying explicitly whether ITS comments request is ALLOWED or NOT ALLOWED. Before launching the runs, take the remaining ScrapeCreators allowance (the limit minus `run.json.credits.scrapecreators`), work out how many videos N may get a comments request, mark only the first N videos in `approved.md` order as ALLOWED and the rest as NOT ALLOWED, so that parallel runs never share one stale count.
 
 After each `hook-marketer` reply, add the credit it reports (0 or 1) to `run.json.credits.scrapecreators`. You write `run.json`, not the agent. Stay within the limit; never ask an agent for a second comments request.
 
-Check the result: for each approved video `analysis/<nn>-motion.md` and `analysis/<nn>-marketing.md` exist, the marketing file has the eight headings of `../../references/marketing-checklist.md` in that order, and no file exists for a video that was not approved. Then set `run.json.stage` to `breakdown`. Write the stage only after all files are in place.
+Check the result: for each approved video `analysis/<nn>-motion.md` and `analysis/<nn>-marketing.md` exist, the marketing file contains the eight heading lines listed under `Exact heading strings` in `../../references/marketing-checklist.md`, in that order, and no file exists for a video that was not approved. Then set `run.json.stage` to `breakdown`. Write the stage only after all files are in place.
 
 ## 6. The council
 

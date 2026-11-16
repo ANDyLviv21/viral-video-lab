@@ -2,9 +2,24 @@
 
 Format of `analysis/<nn>-marketing.md`, written by the `hook-marketer` agent. One reference video gives one file. Later stages (`review-council`, `synthesizer`) read it as data.
 
-The file is written in the language set in the user's `profile.md` (default Ukrainian). The eight section headings below are fixed, are written exactly as shown, and come in this order. No section is skipped: a section with nothing to report holds one line saying why.
+The file is written in the language set in the user's `profile.md` (default Ukrainian). The eight section headings are fixed and come in this order. In `analysis/<nn>-marketing.md` each one is a level-2 heading with EXACTLY the text listed under `Exact heading strings` below: no number prefix and no backticks (the numbers and backticks in the headings of this reference file are for reading only). No section is skipped: a section with nothing to report holds one line saying why.
 
 Evidence rule: every claim names its evidence, a timestamp (`00:02.4`), a frame file name, a transcript line or a quoted comment. A claim without evidence goes under the sentence "не підтверджено кадрами" in the section where it belongs, or is dropped. Never guess what cannot be seen.
+
+## Exact heading strings
+
+The report contains these eight lines, character for character, in this order (the skill checks for them):
+
+```
+## Хук (0–3 с)
+## Структура за часом
+## Субтитри
+## Безпечні зони
+## Ризики обмежень
+## Заклик до дії
+## Чому зайшло
+## Що взяти собі
+```
 
 ## 1. `Хук (0–3 с)`
 

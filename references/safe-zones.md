@@ -14,7 +14,7 @@ Every row carries a source URL, the check date and a mark: «офіційне» 
 |----------|---------|------------|----------|-----------|--------------------|------|
 | Instagram Reels (ads) | 269 | 672 | 65 | 65 | Meta Ads Guide, Instagram Reels, https://www.facebook.com/business/ads-guide/update/image/instagram-reels , 2026-11-16. The page prints percentages only: "roughly 14% of the top, 35% of the bottom, and 6% on each side" (page resolution 1440×2560). Pixels = percentage × 1920 or × 1080, rounded | офіційне (percentages); pixels computed by us |
 | TikTok (In-Feed ads) | 240 | 660 | 120 | 120 | Numbers measured from TikTok's own In-Feed safe-zone template (drawn 720×1280, scaled ×1.5) by https://www.socialync.io/tools/safe-zones/tiktok , 2026-11-16, and the same values at https://www.upload-post.com/tools/safe-zone-checker/ (page says checked 2026-09-23). TikTok's own page https://ads.tiktok.com/help/article/tiktok-auction-in-feed-ads?lang=en , 2026-11-16, offers the template files but prints NO pixel or percent values | неофіційне (the number); the template itself is official |
-| TikTok right button column | — | — | — | column about 180 px wide inside the right margin, starting about 840 px from the top (one source says 300 px tall, the other 180 px wide: they disagree, use the wider one) | same two third-party pages, 2026-11-16 | неофіційне |
+| TikTok right button column | — | — | — | column about 180 px wide inside the right margin, starting about 840 px from the top (one source says 300 px tall, the other 180 px wide: the two sources disagree, the value is unresolved, and nothing should be placed in this area in reliance on either number) | same two third-party pages, 2026-11-16 | неофіційне |
 | YouTube Shorts (Google video ads, vertical) | 288 | 672 | 48 | 192 | Google prints the numbers only inside a safe-zone image on https://support.google.com/google-ads/answer/13547298?hl=en , 2026-11-16 (the page text says only: keep "your logo, product, supers" inside the red safe area; the image alt text confirms 1080×1920). The pixel values are read from that image by https://www.upload-post.com/tools/safe-zone-checker/ (2026-11-16) and https://adkit.so/tools/safe-zones/youtube (2026-11-16, same numbers; its x48..x888, y288..y1248 rectangle matches) | неофіційне (the number); the image is official |
 
 What the official text says without numbers: Google: "Overlays, call-to-actions, and buttons may appear in different places depending on the format, campaign type, and screen." TikTok: the safe zone depends on the dimension, the ad caption length and any extra formats; "The longer the caption, the smaller the safe zone"; there may be "slight differences between the preview and the live version"; separate files exist for anchors and for right-to-left (Arabic).
@@ -30,7 +30,7 @@ No platform names a "subtitle zone". The band below is derived by us, from the m
 - Hook text in the first seconds: inside y 288 to 960 (the upper part of the safe rectangle, above the subtitle band).
 - If the video is published to ONE platform only, the margins of that platform's row may be used instead, and the band moves accordingly. The report must say which rule was applied.
 
-## Text and topics the platforms restrict
+## Текст і теми, які платформи обмежують
 
 Section name in reports: `Текст і теми, які платформи обмежують`. These are the policy pages (all opened 2026-11-16). They are long and change; the table says what each page is for and what was seen in it. Marks: офіційне.
 
