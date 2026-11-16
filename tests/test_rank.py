@@ -77,6 +77,41 @@ class RankTests(unittest.TestCase):
         self.assertEqual(scored["a"]["missing_metrics"], ["saves"])
         self.assertEqual(scored["b"]["missing_metrics"], [])
 
+    def test_all_engagement_missing_is_neutral_not_zero(self):
+        # A record with NONE of the four engagement metrics has unknown
+        # engagement: it is neither zero nor counted in its peers' pool.
+        unknown = cand("u", likes=None, comments=None, shares=None, saves=None)
+        low = cand("l", views=1000, likes=1, comments=0, shares=0, saves=0)
+        high = cand("h", views=1000, likes=500, comments=50, shares=50, saves=50)
+        scored = {s["id"]: s for s in rank.score_candidates([unknown, low, high], CFG)}
+        self.assertIsNone(scored["u"]["engagement_raw"])
+        self.assertEqual(scored["u"]["engagement_pct"], 0.5)
+        self.assertEqual(sorted(scored["u"]["missing_metrics"]),
+                         ["comments", "likes", "saves", "shares"])
+        # The known records are ranked among the known only.
+        self.assertEqual(scored["l"]["engagement_pct"], 0.5)
+        self.assertEqual(scored["h"]["engagement_pct"], 1.0)
+
+    def test_unknown_engagement_is_neutral_on_every_platform(self):
+        # The same missing data must not score high on one platform and low on
+        # another just because of how many other records share the gap.
+        ig = [cand(f"i{n}", platform="instagram", likes=None, comments=None,
+                   shares=None, saves=None) for n in range(4)]
+        tt = [cand("t0", platform="tiktok", likes=None, comments=None,
+                   shares=None, saves=None)]
+        tt += [cand(f"t{n}", platform="tiktok", likes=100 * n, comments=n,
+                    shares=n, saves=n) for n in range(1, 4)]
+        scored = rank.score_candidates(ig + tt, CFG)
+        unknown_pcts = {s["engagement_pct"] for s in scored
+                        if len(s["missing_metrics"]) == 4}
+        self.assertEqual(unknown_pcts, {0.5})
+
+    def test_markdown_says_engagement_is_unknown(self):
+        unknown = cand("u", likes=None, comments=None, shares=None, saves=None)
+        self.run_main([unknown, cand("k")])
+        md = (self.tmp / "top5.md").read_text(encoding="utf-8")
+        self.assertIn("залученість невідома", md)
+
     def test_virality_basis_priority(self):
         outlier = cand("o", outlier_score=8, views=50000,
                        author_median_views=10000)

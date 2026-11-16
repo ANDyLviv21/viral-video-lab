@@ -180,12 +180,18 @@ def filter_candidates(cands: list, cfg: dict, now: datetime) -> tuple:
     return kept, dropped
 
 
+# Engagement percentile given to a record that has none of the four metrics.
+UNKNOWN_ENGAGEMENT_PCT = 0.5
+
+
 def engagement_raw(c: dict, weights: dict) -> tuple:
     present = [m for m in ENGAGEMENT_METRICS if c.get(m) is not None]
     missing = [m for m in ENGAGEMENT_METRICS if c.get(m) is None]
     weight_sum = sum(weights[m] for m in present)
     if not present or not weight_sum:
-        return 0.0, missing
+        # Nothing is known about engagement. That is not zero engagement, and
+        # it must not be ranked against the peers who do have data.
+        return None, missing
     total = sum(weights[m] * c[m] for m in present)
     return total / (c["views"] * weight_sum), missing
 
@@ -220,10 +226,17 @@ def score_candidates(cands: list, cfg: dict) -> list:
     for platform in by_platform:
         peers = [s for s in scored if s["platform"] == platform]
         v_all = [s["virality_raw"] for s in peers]
-        e_all = [s["engagement_raw"] for s in peers]
+        # Only the records whose engagement is known form the engagement pool.
+        e_all = [s["engagement_raw"] for s in peers
+                 if s["engagement_raw"] is not None]
         for s in peers:
             s["virality_pct"] = percentile(s["virality_raw"], v_all)
-            s["engagement_pct"] = percentile(s["engagement_raw"], e_all)
+            if s["engagement_raw"] is None or not e_all:
+                # Unknown engagement is neutral: neither rewarded nor punished
+                # for data the platform did not give us.
+                s["engagement_pct"] = UNKNOWN_ENGAGEMENT_PCT
+            else:
+                s["engagement_pct"] = percentile(s["engagement_raw"], e_all)
 
     w = cfg["weights"]
     for s in scored:
@@ -263,6 +276,10 @@ def _video_block(rank_no: int, s: dict) -> list:
         "- Основа вірусності: {} (сире значення {:.3f})".format(
             s["virality_basis"], s["virality_raw"]),
         "- Немає метрик: {}".format(missing),
+    ] + ([
+        "- Увага: залученість невідома (немає жодної з метрик), прийнято "
+        "нейтральну середину {:.1f}.".format(UNKNOWN_ENGAGEMENT_PCT),
+    ] if s.get("engagement_raw") is None else []) + [
         "- Опис: {}".format(caption),
         "",
     ]
