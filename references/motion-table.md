@@ -2,7 +2,7 @@
 
 Format of `analysis/<nn>-motion.md`, written by the `motion-analyst` agent. One reference video gives one file. Later stages (`hook-marketer`, `review-council`, `synthesizer`, `recreation-director`) read it as data.
 
-The file is written in the language set in the user's `profile.md` (default Ukrainian). The column headers and section headings below are fixed and are written exactly as shown, in this order.
+The file is written in the language set in the user's BASE `profile.md` (default Ukrainian; `direction-profile.md`, section `Precedence`). The column headers and section headings below are fixed and are written exactly as shown, in this order.
 
 ## Table
 

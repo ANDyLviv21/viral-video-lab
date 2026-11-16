@@ -34,7 +34,7 @@ Questions, in this order:
 2. Hook. Does the first 3 seconds create a reason to keep watching (curiosity gap, a promise, a pattern break, a conflict)? Is it the same promise the video then pays off?
 3. Structure. Are there dead seconds, a sagging middle, a payoff that comes too late or too early? Is there a loop or a reason to rewatch?
 4. Call to action. Is there one clear action, placed after value, matching the offer? Is it too many asks?
-5. Message fit. Does the video suit the user's audience and style from `profile.md`?
+5. Message fit. Does the video suit the user's audience and style from the run's `direction-profile.md`, falling back to the base `profile.md` (`direction-profile.md`, section `Precedence`)?
 
 ## Role `Таргетолог`
 

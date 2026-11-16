@@ -8,7 +8,7 @@ Fixed queries for stage 1 (scouting). Connector tools are named by the END of th
 
 | Source | Tool (name ending) | Parameters | Cost | Raw answer saved as |
 |--------|--------------------|------------|------|---------------------|
-| vidIQ | `vidiq_instagram_tiktok_outlier_search` | two calls, `embeddingType` = `concept` and `hook`; `resultsPerPlatform` = 15; `durationMax` = 90; `datePostedAfter` = today minus the period; `descriptionLanguage` and `audienceQuery` taken from `profile.md` (see Profile mapping) | 5 CREDITS per call (2 calls = 10 credits, not 2) | `sources-raw/vidiq-concept.json`, `sources-raw/vidiq-hook.json` |
+| vidIQ | `vidiq_instagram_tiktok_outlier_search` | two calls, `embeddingType` = `concept` and `hook`; `resultsPerPlatform` = 15; `durationMax` = 90; `datePostedAfter` = today minus the period; `descriptionLanguage` and `audienceQuery` taken from the run's `direction-profile.md`, falling back to `profile.md` (see Profile mapping) | 5 CREDITS per call (2 calls = 10 credits, not 2) | `sources-raw/vidiq-concept.json`, `sources-raw/vidiq-hook.json` |
 | ScrapeCreators | `v1_tiktok_search_keyword` | `date_posted` = `this-month`, `sort_by` = `most-liked`, `trim` = `true`, up to 2 pages | 1 credit per call | `sources-raw/scrapecreators-tiktok-<page>.json` |
 | ScrapeCreators | `v2_instagram_reels_search` | `date_posted` = `last-month`, up to 2 pages | 1 credit per call | `sources-raw/scrapecreators-instagram-<page>.json` |
 | ScrapeCreators | `v1_youtube_search` | `type` = `shorts`, `uploadDate` = `this_month`, `sortBy` = `popular` | 1 credit per call | `sources-raw/scrapecreators-youtube-1.json` |
@@ -36,9 +36,12 @@ One request per video at most, made by the `viral-breakdown` skill, never retrie
 
 ## Profile mapping
 
-- `descriptionLanguage`: the content language named in the `Аудиторія` section of `profile.md`.
-- `audienceQuery`: a short phrase built from the `Аудиторія` section (who watches), with the niche from the `Тематика` section.
-- If `profile.md` was not given or the section does not say, omit the parameter; do not guess.
+Both parameters are DIRECTION-specific, so they come from the run's `direction-profile.md` and fall back to the base `profile.md`. The precedence rule itself is written once, in `direction-profile.md`; this section only says which sections feed which parameter.
+
+- `descriptionLanguage`: the content language named in the `Мова пошуку` section of the run's `direction-profile.md`; if that section is empty or says `не визначено`, the language named in its `Аудиторія` section.
+- `audienceQuery`: a short phrase built from the `Аудиторія` section of the direction profile (who watches), with the niche from its `Тематика` section.
+- If the run has no direction profile, take both from the base `profile.md` where it names them.
+- If neither file was given, or the sections do not say, omit the parameter; do not guess.
 
 ## Rules
 
