@@ -81,20 +81,28 @@ The yt-dlp rules in `references/source-queries.md` (the `https://` check, the `-
 
 ### Where the edit is made: the repository, never the plugin cache
 
-The run does not execute this repository. `~/.claude/plugins/installed_plugins.json`
-points at a COPY of the plugin under `.claude/plugins/cache/`, and that copy is what
-the running plugin loads. Two things follow, and both matter for every change this
-loop makes. An edit made in the repository folder does not reach the running plugin
-until the plugin is updated and Claude Code is restarted. An edit made under
-`.claude/plugins/cache/` is outside git, is in no commit, and is wiped by the next
-plugin update, so it is lost work that also silently disagrees with the repository.
-Therefore: make the edit in the repository folder, always; then make it live with
-`claude plugin marketplace update viral-video-lab`, then
-`claude plugin update viral-video-lab@viral-video-lab`, then restart Claude Code; and
-never edit, never patch and never "just try" anything under `.claude/plugins/cache/`,
-not even to test a one-line fix. Tell the user that the change they just approved is
-in the repository and takes effect after those two commands and the restart, so the
-run they are in now still uses the old text.
+Make the edit in the repository folder, always. Never edit, never patch and never
+"just try" anything under `.claude/plugins/cache/`, not even a one-line fix: that
+copy is outside git, is in no commit, and is replaced by the next plugin update, so
+it is lost work that also silently disagrees with the repository.
+
+When the edit starts taking effect depends on how the plugin was installed, and the
+CLI will tell you rather than you guessing. Run `claude plugin list` and read the
+`Read from:` line for `viral-video-lab`:
+
+- It names the repository folder (a marketplace added from a local path). The plugin
+  is loaded from that folder, and `claude plugin update` says so: nothing to update,
+  edits take effect at the next session start or after `/reload-plugins`. A stale copy
+  from install time still sits in `.claude/plugins/cache/`; it is not what loads, and
+  it is still never edited.
+- It names anything else (installed from GitHub). The edit has to be pushed first,
+  then made live with `claude plugin marketplace update viral-video-lab`, then
+  `claude plugin update viral-video-lab@viral-video-lab`, then a restart.
+
+Either way, tell the user plainly that the change they just approved is in the
+repository, say which of the two cases theirs is and what makes it live, and say that
+the run they are in now still uses the old text. If a change does not show up, the two
+update commands followed by a restart are safe in both cases.
 
 For each change, do these in order:
 
