@@ -13,6 +13,8 @@ Used by the `synthesizer` (section `Чим збирати`), the `recreation-dir
 | Subtitle timing | Whisper, local | Word timing from the voice track; no cloud transcription |
 | Final export | `/ffmpeg-skill` | 1080×1920 mp4 per platform, with the checks in `viral-recreate` |
 
+Paid generation is not available to the `recreation-director` agent at all: it describes what it needs in `recreation/paid-request.md`, and the skill runs the generation after the user agrees.
+
 ## Choosing
 
 1. Free and local first. If the idea can be built in HyperFrames without a generated frame, it is built there.
