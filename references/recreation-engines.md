@@ -7,7 +7,7 @@ Used by the `synthesizer` (section `Чим збирати`), the `recreation-dir
 | Default | HyperFrames: HTML and GSAP, local render | Free, local. Run through the HyperFrames skills (`/hyperframes`, `/hyperframes-cli`). Vertical 1080×1920 composition, up to 90 seconds. Never the hosted HyperFrames connector: it is not local and may cost money |
 | A video driven by data, or React components needed | Remotion | Run through the Remotion skills (`/remotion-best-practices`). Local render |
 | 3D object in frame | `/threejs` | A Three.js scene rendered as part of the HyperFrames or Remotion project |
-| A complex 3D scene | Blender | Through the Blender skills and the Blender connector. Render locally |
+| A complex 3D scene | Blender | The `viral-recreate` skill runs it in the main conversation (Blender skills and connector), renders locally into `recreation/assets/`, and the director places the files in the project. The director cannot run Blender itself |
 | Generated frames or clips | `/video-prompting` writes the prompts, `/higgsfield` makes the generation | PAID. Never started without Stop 3: the sum is shown and the user agrees first |
 | Footage the user shot | `/video-editing` | Cutting, structure and polish of real footage |
 | Subtitle timing | Whisper, local | Word timing from the voice track; no cloud transcription |
