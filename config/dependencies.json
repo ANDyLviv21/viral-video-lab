@@ -76,7 +76,6 @@
     "name": "reference-video-replica-qc",
     "required": false,
     "used_by": [
-      3,
       8
     ],
     "install_hint": "встановити скіл reference-video-replica-qc у ~/.claude/skills",
@@ -88,7 +87,6 @@
     "name": "ffmpeg-skill",
     "required": false,
     "used_by": [
-      2,
       8
     ],
     "install_hint": "встановити скіл ffmpeg-skill у ~/.claude/skills",
