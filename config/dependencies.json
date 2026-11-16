@@ -110,8 +110,7 @@
     "name": "social",
     "required": false,
     "used_by": [
-      4,
-      5
+      4
     ],
     "install_hint": "встановити скіл social у ~/.claude/skills",
     "extra_paths": []
@@ -122,8 +121,7 @@
     "name": "ad-creative",
     "required": false,
     "used_by": [
-      4,
-      5
+      4
     ],
     "install_hint": "встановити скіл ad-creative у ~/.claude/skills",
     "extra_paths": []
@@ -134,7 +132,6 @@
     "name": "ads",
     "required": false,
     "used_by": [
-      4,
       5
     ],
     "install_hint": "встановити скіл ads у ~/.claude/skills",

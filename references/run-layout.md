@@ -78,6 +78,7 @@ A stage writes its value after it finishes successfully, never before. A stage t
 | 4 prepare (before the agent runs) | skill | `analysis/<nn>-inputs/social.md`, `analysis/<nn>-inputs/ad-creative.md` (from `/social` and `/ad-creative`); `analysis/<nn>-inputs/comments.json` (the one comments request per allowed video, made by the skill); `run.json.credits.scrapecreators` immediately after each comments request |
 | 4 breakdown | `hook-marketer` | `analysis/<nn>-marketing.md` (it reads no `-motion.md`: both agents run in parallel). It calls no connector and writes no `credits` |
 | 4 close | skill | `run.json.stage: breakdown` once all breakdown files of stages 3 and 4 exist |
+| 5 prepare (before the role runs) | skill | `analysis/<nn>-inputs/ads.md` (from `/ads`, the campaign view; `джерело недоступне` when the skill is absent). Only the `Таргетолог` role run reads it |
 | 5 review | `review-council` | `review-marketer.md`, `review-targetolog.md`, `review-smm.md` (one run per role, each reads no other role's file), then `review.md` (consolidating run, reads the three role files) |
 | 5 close | skill | `run.json.stage: review` after `review.md` exists |
 | 5 audit (one-link run only) | skill | `audit.md`: the verdict on that one reel, written by the skill from the stage 3 to 5 files (`viral-breakdown` step 8) |

@@ -54,6 +54,7 @@ Then, in the same spend line, show the third-party skills this stage runs and sa
 /watch: вартість невідома, поза лімітами плагіна
 /social: вартість невідома, поза лімітами плагіна
 /ad-creative: вартість невідома, поза лімітами плагіна
+/ads: вартість невідома, поза лімітами плагіна
 /last30days: вартість невідома, поза лімітами плагіна
 ```
 
@@ -113,7 +114,9 @@ Check the result: for each approved video `analysis/<nn>-motion.md` and `analysi
 
 Start `review-council` three times, once per role, then a fourth time to consolidate. Run the three role runs in parallel. Give every run ABSOLUTE paths and a line `mode: role` and `role: <name>` or `mode: consolidate`.
 
-Role runs (`Маркетолог`, `Таргетолог`, `SMM-фахівець`): give each one `approved.md`, every `analysis/<nn>-marketing.md` and `analysis/<nn>-motion.md`, the frames folders, `references/council-roles.md`, `references/safe-zones.md`, `profile.md`, and ONE output file: `review-marketer.md`, `review-targetolog.md` or `review-smm.md` in the run folder. Give a role run no other role's file and do not mention them.
+First, the one piece of preparation this stage needs. `/ads` is the campaign-side view and the `Таргетолог` role is the only one that can use it, so run it HERE, in the main conversation, before the role runs start (method B: the agent calls no skill). Run `/ads` once per approved video on that video's `analysis/<nn>-marketing.md` and its line from `approved.md`, asking whether this video would work as a paid creative and what a test of it would look like, and write the answer to `analysis/<nn>-inputs/ads.md`. If `/ads` is not installed, write the line `джерело недоступне` as the whole content of that file. Its cost is unknown to this plugin, like every third-party skill, and it was named with the others in the spend line of step 3.
+
+Role runs (`Маркетолог`, `Таргетолог`, `SMM-фахівець`): give each one `approved.md`, every `analysis/<nn>-marketing.md` and `analysis/<nn>-motion.md`, the frames folders, `references/council-roles.md`, `references/safe-zones.md`, `profile.md`, and ONE output file: `review-marketer.md`, `review-targetolog.md` or `review-smm.md` in the run folder. Give a role run no other role's file and do not mention them. The `Таргетолог` run ALSO gets every `analysis/<nn>-inputs/ads.md`, since the campaign view belongs to that role alone; the other two roles do not receive it.
 
 Consolidation run: give it only the three role files, `references/council-roles.md`, `profile.md` and the output file `review.md`.
 
