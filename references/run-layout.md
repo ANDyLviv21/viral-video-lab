@@ -69,6 +69,6 @@ Handoff for `motion-analyst`:
 
 1. The orchestrating skill runs `/watch` on `videos/<nn>.mp4` with `--engine local` (`--detail token-burner` for videos up to 15 seconds; longer videos in segments of 10 to 15 seconds with `--start` and `--end`; `--resolution 1024` for small text), in the main conversation.
 2. It stores the frames in `analysis/<nn>-frames/` and the transcript in a text file, for example `analysis/<nn>-frames/transcript.txt`.
-3. It starts the agent with absolute paths to: the frames folder, the transcript file, the video file (for `ffprobe` only), `references/motion-table.md`, and the output file `analysis/<nn>-motion.md`.
+3. It starts the agent with absolute paths to: the frames folder, the transcript file, the video file (for `ffprobe` only), `references/motion-table.md`, the output file `analysis/<nn>-motion.md`, and optionally the absolute path of the user's `profile.md` (if it is not passed or cannot be read, the agent writes the report in Ukrainian).
 
 Other agents follow the same rule: anything that needs a third-party skill is prepared by the orchestrating skill, and the agent receives only the resulting files.
