@@ -1,6 +1,6 @@
 ---
 name: viral-recreate
-description: Finds what the approved reference videos have in common, offers 2 to 3 combo variants, recreates the chosen one in the user's own theme and character, checks the draft and exports the final videos. Use when the user says відтвори ролик, зроби combo, зроби свій ролик за референсами, viral recreate, recreate the video or synthesise the references.
+description: Finds what the approved reference videos of a viral-video-lab run have in common, offers 2 to 3 combo variants, recreates the chosen one in the user's own theme and character, checks the draft and exports the final videos. Use when the user says відтвори ролик за референсами, зроби combo за вірусними роликами, зроби свій ролик за референсами viral lab, viral recreate, recreate the references of this run or synthesise the approved references. Not for editing or remaking some unrelated video.
 ---
 
 # Viral Recreate

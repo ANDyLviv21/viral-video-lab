@@ -1,6 +1,6 @@
 ---
 name: viral-lab
-description: Runs the whole viral-video-lab chain (scout, breakdown, recreate) in order, resumes an unfinished run from its run.json, and after a finished run turns the user's complaints into plugin improvements. Use when the user says запусти viral lab, продовжи запуск, продовжи viral lab, що в мене незавершене, зроби вірусне відео, що було не так із запуском, viral lab, continue the run, resume the run or start a viral video run.
+description: Runs the whole viral-video-lab chain (scout, breakdown, recreate) in order, resumes an unfinished viral-video-lab run from its run.json, and after a finished run turns the user's complaints into plugin improvements. Use when the user says запусти viral lab, продовжи viral lab, продовжи запуск viral lab, які запуски viral lab незавершені, зроби вірусне відео, що було не так із запуском viral lab, viral lab, continue the viral lab run, resume a viral-video-lab run or start a viral video run. Not for unrelated unfinished work or any other kind of run.
 ---
 
 # Viral Lab

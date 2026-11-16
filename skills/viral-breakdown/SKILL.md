@@ -1,6 +1,6 @@
 ---
 name: viral-breakdown
-description: Breaks down each approved reference video as a motion designer and as a marketer, then runs a three-role review council and shows review.md. Use when the user says розбери ролики, зроби розбір референсів, запусти раду, viral breakdown, break down the approved videos or analyse this video link.
+description: Breaks down each approved reference video of a viral-video-lab run as a motion designer and as a marketer, then runs a three-role review council and shows review.md. Use when the user says розбери референси, зроби розбір вірусних роликів, розбери ролики запуску viral lab, запусти раду viral lab, viral breakdown, break down the approved references or analyse this video link as a viral reference. Not for a general question about some video.
 ---
 
 # Viral Breakdown
