@@ -7,7 +7,9 @@ The pipeline stages talk to each other only through files in one run folder, cre
 ```
 runs/<YYYY-MM-DD>-<slug>/
   run.json  brief.md  trends.md  candidates.json  ranked.json  top5.md  approved.md
-  videos/<nn>.mp4                     nn = 01, 02... in the order of approved.md
+  trends-input/<section>.md           one file per trends.md section, from /last30days
+  videos/<nn>.mp4                     nn = top rank before approval, approved.md order after Stop 1
+  videos/unused/                      videos not approved at Stop 1
   analysis/<nn>-motion.md  analysis/<nn>-marketing.md  analysis/<nn>-frames/
   review.md  playbook.md  combo-brief.md
   recreation/storyboard.md  recreation/project/  recreation/draft.mp4
@@ -34,10 +36,11 @@ A stage writes its value after it finishes successfully, never before. A stage t
 
 | Stage | Agent | Writes |
 |-------|-------|--------|
-| 0 brief | skill | `run.json`, `brief.md` |
-| 1 scout | `trend-scout` | `candidates.json`, `trends.md` |
-| 2 select | `top-selector` | `ranked.json`, `top5.md`, `videos/` |
-| Stop 1: user approves references | none | `approved.md` |
+| 0 brief | skill | `run.json` (creation), `brief.md` |
+| 1 prepare (before the agent runs) | skill | `trends-input/<section>.md` (from `/last30days`) |
+| 1 scout | `trend-scout` | `candidates.json`, `trends.md`; in `run.json` only the actual `credits` and `stage: scout` |
+| 2 select | `top-selector` | `ranked.json`, `top5.md`, `videos/<nn>.mp4`; in `run.json` only `stage: select` |
+| Stop 1: user approves references | skill | `approved.md`, `run.json.approved` and `stage: approve`, renumbered `videos/<nn>.mp4`, `videos/unused/` |
 | 3 prepare (before the agent runs) | skill | `analysis/<nn>-frames/` (frames and transcript, from `/watch`) |
 | 3 breakdown | `motion-analyst` | `analysis/<nn>-motion.md` |
 | 4 breakdown | `hook-marketer` | `analysis/<nn>-marketing.md` |
@@ -48,6 +51,12 @@ A stage writes its value after it finishes successfully, never before. A stage t
 | 8 qc | `quality-controller` | `qc.md`, `final/` |
 
 Stop 3 is any point before a paid action, at any stage: the stage stops and asks the user first.
+
+`run.json` writers: `trend-scout` writes the actual credit spend and `stage: scout`; `top-selector` writes `stage: select`; the skill writes everything else (creation, `approved`, and the later stages).
+
+`trends-input/<section>.md` follows the same method-B rule as `/watch` below: the skill runs `/last30days` in the main conversation and the agent only reads the files.
+
+`videos/` numbering: `top-selector` downloads before approval and numbers by top rank. At Stop 1 the skill renumbers to `approved.md` order, using temporary names so nothing is overwritten. Videos not approved are moved to `videos/unused/`, not deleted.
 
 ## Rule: a stage reads only earlier files
 
