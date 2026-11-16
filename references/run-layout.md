@@ -7,11 +7,15 @@ The pipeline stages talk to each other only through files in one run folder, cre
 ```
 runs/<YYYY-MM-DD>-<slug>/
   run.json  brief.md  trends.md  candidates.json  ranked.json  top5.md  approved.md
+  spend-consent.md                    one line per spend decision of stages 1 and 4
+  sources-raw/<source>-<label>.json   raw answers of the paid searches, written by the skill
+  sources-raw/index.md                one line per attempted call: source, tool, query, credits, file, ok or failed
   trends-input/<section>.md           one file per trends.md section, from /last30days
   videos/<nn>.mp4                     nn = top rank before approval, approved.md order after Stop 1
   videos/unused/                      videos not approved at Stop 1
   analysis/<nn>-motion.md  analysis/<nn>-marketing.md  analysis/<nn>-frames/
   analysis/<nn>-inputs/social.md  analysis/<nn>-inputs/ad-creative.md   from /social and /ad-creative
+  analysis/<nn>-inputs/comments.json   the comments answer, fetched by the skill; `коментарі недоступні` when there are none
   review-marketer.md  review-targetolog.md  review-smm.md   one per council role
   review.md  playbook.md  combo-brief.md  choice.md
   recreation/engine-notes.md          from third-party skills, for the director
@@ -40,6 +44,10 @@ profile.md
 
 Stage 7 and 8 add two optional fields, written by the skill only: `qc_rounds` (number of fix rounds after the first quality check, 0 at the start) and `credits.generation` (an object keyed by tool name with the ACTUAL spend of paid generations, for example `{"higgsfield": 12}`, created on the first paid generation).
 
+`credits.scrapecreators` and `credits.vidiq` are CREDITS, never numbers of calls: one vidIQ outlier search is 5 credits, one ScrapeCreators call is 1 credit. The limits they are compared against (`limits` in `config/sources.json`) are credits too, and every figure shown to the user is said in credits. `limits.generation` is the per-run ceiling for paid generation, in the generator's own units summed over the keys of `credits.generation`.
+
+Spend is recorded as it happens: the skill adds a call's credits to `run.json` immediately after that call returns, before the next one, and never waits for the end of a stage or for an agent's self-report. A run interrupted mid-stage therefore shows on disk what it really spent, and a resume reads `credits` as it stands and subtracts it from the limits instead of starting from zero.
+
 `stage` takes these values, in this order:
 
 `brief`, `scout`, `select`, `approve`, `breakdown`, `review`, `synthesis`, `choose`, `recreate`, `qc`, `done`
@@ -51,14 +59,16 @@ A stage writes its value after it finishes successfully, never before. A stage t
 | Stage | Agent | Writes |
 |-------|-------|--------|
 | 0 brief | skill | `run.json` (creation), `brief.md` |
-| 1 prepare (before the agent runs) | skill | `trends-input/<section>.md` (from `/last30days`) |
-| 1 scout | `trend-scout` | `candidates.json`, `trends.md`; in `run.json` only the actual `credits` and `stage: scout` |
+| 1 consent | skill | `spend-consent.md` (one appended line per decision; no paid call before a yes) |
+| 1 prepare (before the agent runs) | skill | `trends-input/<section>.md` (from `/last30days`); `sources-raw/<source>-<label>.json` and `sources-raw/index.md` (the paid vidIQ and ScrapeCreators searches, made by the skill); `run.json.credits` after each of those calls |
+| 1 scout | `trend-scout` | `candidates.json`, `trends.md`; in `run.json` only `stage: scout`. It calls no connector and writes no `credits` |
 | 2 select | `top-selector` | `ranked.json`, `top5.md`, `videos/<nn>.mp4`; in `run.json` only `stage: select` |
 | Stop 1: user approves references | skill | `approved.md`, `run.json.approved` and `stage: approve`, renumbered `videos/<nn>.mp4`, `videos/unused/` |
 | 3 prepare (before the agent runs) | skill | `analysis/<nn>-frames/` (frames and transcript, from `/watch`) |
 | 3 breakdown | `motion-analyst` | `analysis/<nn>-motion.md` |
-| 4 prepare (before the agent runs) | skill | `analysis/<nn>-inputs/social.md`, `analysis/<nn>-inputs/ad-creative.md` (from `/social` and `/ad-creative`); `run.json.credits.scrapecreators` after each comments request; `stage: breakdown` once all breakdown files exist |
-| 4 breakdown | `hook-marketer` | `analysis/<nn>-marketing.md` (it reads no `-motion.md`: both agents run in parallel) |
+| 4 consent | skill | `spend-consent.md` (one appended line per decision; no comments request before a yes) |
+| 4 prepare (before the agent runs) | skill | `analysis/<nn>-inputs/social.md`, `analysis/<nn>-inputs/ad-creative.md` (from `/social` and `/ad-creative`); `analysis/<nn>-inputs/comments.json` (the one comments request per allowed video, made by the skill); `run.json.credits.scrapecreators` immediately after each comments request; `stage: breakdown` once all breakdown files exist |
+| 4 breakdown | `hook-marketer` | `analysis/<nn>-marketing.md` (it reads no `-motion.md`: both agents run in parallel). It calls no connector and writes no `credits` |
 | 5 review | `review-council` | `review-marketer.md`, `review-targetolog.md`, `review-smm.md` (one run per role, each reads no other role's file), then `review.md` (consolidating run, reads the three role files) |
 | 5 close | skill | `run.json.stage: review` after `review.md` exists |
 | 6 synthesis | `synthesizer` | `playbook.md`, `combo-brief.md` |
@@ -76,9 +86,15 @@ A stage writes its value after it finishes successfully, never before. A stage t
 
 Stop 3 is any point before a paid action, at any stage: the stage stops and asks the user first.
 
-For the paid actions of stage 7, Stop 3 works as follows: `recreation-director` never starts a paid action. It writes `recreation/paid-request.md` with the items and the sum, replies `СТОП 3: потрібна згода` and stops; the skill shows the sum, waits for the user's explicit yes, runs the generation itself and records the actual spend. No agent writes `credits.generation`.
+For the paid actions of stage 7, Stop 3 works as follows: `recreation-director` never starts a paid action. It writes `recreation/paid-request.md` with the items and the sum, replies `СТОП 3: потрібна згода` and stops; the skill shows the sum, waits for the user's explicit yes, runs the generation itself and records the actual spend in `run.json.credits.generation` immediately after each item. No agent writes `credits.generation`. The per-run ceiling `limits.generation` in `config/sources.json` applies across all of a run's Stop 3 decisions: reaching it stops the work and asks the user, it is never passed silently.
 
-`run.json` writers: `trend-scout` writes the actual credit spend and `stage: scout`; `top-selector` writes `stage: select`; the skill writes everything else (creation, `approved`, the later stages, `qc_rounds` and `credits.generation`). `hook-marketer` makes at most one paid comments request per video and reports it in its reply; the skill adds it to `credits.scrapecreators`, so parallel agents never write `run.json`.
+`run.json` writers: `trend-scout` writes `stage: scout`; `top-selector` writes `stage: select`; the skill writes everything else (creation, `approved`, every `credits` figure, the later stages, `qc_rounds` and `credits.generation`). No agent ever writes `credits`, so parallel agents never collide over `run.json`.
+
+## Rule: only the orchestrating skill calls a connector
+
+No agent calls a paid connector, and no agent holds one in its `tools` key. Every paid call — the vidIQ outlier searches and the ScrapeCreators searches and author lookups of stage 1, the comments request of stage 4, and the generation of stage 7 — is made by the orchestrating skill in the main conversation, where the user sees it and has consented to the sum. The skill saves the raw answer as a file (`sources-raw/…`, `analysis/<nn>-inputs/comments.json`, `recreation/assets/`) and records the spend in `run.json` immediately, and the agent reads only those files.
+
+Why: `trend-scout` and `hook-marketer` read captions, descriptions, transcripts and comments from other people's videos, which an attacker controls. A Claude Code agent with no `tools` key inherits every tool in the session, including every connector the user has enabled; and a `tools` allowlist cannot portably name one connector, because a connector's server prefix differs on every machine and `tools` has no cross-server wildcard. So the two agents get `tools: Read, Write, Glob, Grep` — no connector, no `Bash`, no `Skill` — and the money moves to the skill. This is the same method-B decision already made for third-party skills below.
 
 `trends-input/<section>.md` follows the same method-B rule as `/watch` below: the skill runs `/last30days` in the main conversation and the agent only reads the files.
 

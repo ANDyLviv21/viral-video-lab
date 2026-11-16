@@ -75,6 +75,14 @@ class ValidatePluginTests(unittest.TestCase):
             any("agents/a.md: model missing" in e for e in validate(self.root))
         )
 
+    def test_agent_requires_tools(self):
+        make_plugin(self.root)
+        write(self.root, "agents/a.md",
+              "---\nname: a\ndescription: d\nmodel: inherit\ncolor: blue\n---\nbody\n")
+        self.assertTrue(
+            any("agents/a.md: tools missing" in e for e in validate(self.root))
+        )
+
     def test_referenced_plugin_file_must_exist(self):
         make_plugin(self.root)
         write(self.root, "skills/foo/SKILL.md",

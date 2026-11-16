@@ -10,7 +10,7 @@ from pathlib import Path
 
 KEBAB_RE = re.compile(r"^[a-z0-9]+(-[a-z0-9]+)*$")
 REF_RE = re.compile(r"(?<![\w-])(?:references|scripts|config)/[\w./-]+")
-AGENT_REQUIRED = ("name", "description", "model", "color")
+AGENT_REQUIRED = ("name", "description", "model", "color", "tools")
 
 
 def parse_frontmatter(text: str) -> dict[str, str]:
