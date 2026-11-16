@@ -13,9 +13,18 @@ runs/<YYYY-MM-DD>-<slug>/
   analysis/<nn>-motion.md  analysis/<nn>-marketing.md  analysis/<nn>-frames/
   analysis/<nn>-inputs/social.md  analysis/<nn>-inputs/ad-creative.md   from /social and /ad-creative
   review-marketer.md  review-targetolog.md  review-smm.md   one per council role
-  review.md  playbook.md  combo-brief.md
+  review.md  playbook.md  combo-brief.md  choice.md
+  recreation/engine-notes.md          from third-party skills, for the director
   recreation/storyboard.md  recreation/project/  recreation/draft.mp4
-  qc.md  final/<platform>.mp4
+  recreation/paid-request.md          only when a paid step is needed (Stop 3)
+  recreation/assets/  recreation/assets/index.md   generated or filmed assets, made after a yes at Stop 3
+  recreation/draft-frames/            frames and transcript of draft.mp4, from /watch
+  recreation/replica-qc.md            only if /reference-video-replica-qc is installed
+  qc.md
+  qc-own/inputs/social.md  qc-own/inputs/ad-creative.md   placeholders for the own video
+  qc-own/own-motion.md  qc-own/own-marketing.md           analysis of draft.mp4
+  qc-own/review-marketer.md  qc-own/review-targetolog.md  qc-own/review-smm.md  qc-own/review.md   council on the own video
+  final/<platform>.mp4                platform = instagram, tiktok or youtube; 1080x1920
 library/patterns.md
 profile.md
 ```
@@ -27,6 +36,8 @@ profile.md
 ```
 {"topic", "slug", "created_at", "platforms": [...], "period_days", "stage", "approved": ["01", ...], "credits": {"scrapecreators": 0, "vidiq": 0}}
 ```
+
+Stage 7 and 8 add two optional fields, written by the skill only: `qc_rounds` (number of fix rounds after the first quality check, 0 at the start) and `credits.generation` (an object keyed by tool name with the ACTUAL spend of paid generations, for example `{"higgsfield": 12}`, created on the first paid generation).
 
 `stage` takes these values, in this order:
 
@@ -50,13 +61,22 @@ A stage writes its value after it finishes successfully, never before. A stage t
 | 5 review | `review-council` | `review-marketer.md`, `review-targetolog.md`, `review-smm.md` (one run per role, each reads no other role's file), then `review.md` (consolidating run, reads the three role files) |
 | 5 close | skill | `run.json.stage: review` after `review.md` exists |
 | 6 synthesis | `synthesizer` | `playbook.md`, `combo-brief.md` |
-| Stop 2: user picks a combo variant | none | none |
-| 7 recreate | `recreation-director` | `recreation/` |
-| 8 qc | `quality-controller` | `qc.md`, `final/` |
+| Stop 2: user picks a combo variant | skill | `choice.md`, `run.json.stage: choose` |
+| 6 close | skill | `run.json.stage: synthesis` after `playbook.md` and `combo-brief.md` exist |
+| 7 prepare (before the agent runs) | skill | `recreation/engine-notes.md` (from the HyperFrames, Remotion, `/threejs`, `/video-editing`, `/video-prompting` skills) |
+| Stop 3 (inside stage 7) | skill | after the user's yes only: `recreation/assets/`, `recreation/assets/index.md`, the actual spend in `run.json.credits.generation` |
+| 7 recreate | `recreation-director` | `recreation/storyboard.md`, `recreation/project/`, `recreation/draft.mp4`, `recreation/paid-request.md` (only when it stops for Stop 3) |
+| 7 close | skill | `run.json.stage: recreate` after `draft.mp4` passes `ffprobe` (1080x1920, up to 90 s); `run.json.qc_rounds` |
+| 8 prepare (before the agents run) | skill | `recreation/draft-frames/` (from `/watch`), `recreation/replica-qc.md` (optional), `qc-own/inputs/*.md` |
+| 8 qc | `quality-controller` | `qc.md` |
+| 8 own-video review | `motion-analyst`, `hook-marketer`, `review-council` (same agents as stages 3 to 5, run on `draft.mp4` with the label `власний`) | `qc-own/own-motion.md`, `qc-own/own-marketing.md`, `qc-own/review-marketer.md`, `qc-own/review-targetolog.md`, `qc-own/review-smm.md`, `qc-own/review.md` |
+| 8 close | skill | `run.json.stage: qc` after the verdict is accepted; then `final/<platform>.mp4` (from `/ffmpeg-skill`), the rows of `library/patterns.md`, `run.json.stage: done` |
 
 Stop 3 is any point before a paid action, at any stage: the stage stops and asks the user first.
 
-`run.json` writers: `trend-scout` writes the actual credit spend and `stage: scout`; `top-selector` writes `stage: select`; the skill writes everything else (creation, `approved`, and the later stages). `hook-marketer` makes at most one paid comments request per video and reports it in its reply; the skill adds it to `credits.scrapecreators`, so parallel agents never write `run.json`.
+For the paid actions of stage 7, Stop 3 works as follows: `recreation-director` never starts a paid action. It writes `recreation/paid-request.md` with the items and the sum, replies `СТОП 3: потрібна згода` and stops; the skill shows the sum, waits for the user's explicit yes, runs the generation itself and records the actual spend. No agent writes `credits.generation`.
+
+`run.json` writers: `trend-scout` writes the actual credit spend and `stage: scout`; `top-selector` writes `stage: select`; the skill writes everything else (creation, `approved`, the later stages, `qc_rounds` and `credits.generation`). `hook-marketer` makes at most one paid comments request per video and reports it in its reply; the skill adds it to `credits.scrapecreators`, so parallel agents never write `run.json`.
 
 `trends-input/<section>.md` follows the same method-B rule as `/watch` below: the skill runs `/last30days` in the main conversation and the agent only reads the files.
 
