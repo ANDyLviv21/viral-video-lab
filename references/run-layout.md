@@ -335,9 +335,10 @@ For each call, in the main conversation:
    file, `analysis/<nn>-frames/ffprobe.txt` (not the video file: the agent has
    no `Bash`), `analysis/<nn>-frames/watch-answer.md`,
    `references/motion-table.md`, the output file `analysis/<nn>-motion.md`, and
-   the absolute paths of the run's `direction-profile.md` (when it exists) and
-   of the user's base `profile.md`. The agent applies them under the precedence
-   rule of `references/direction-profile.md`: the direction profile first, the
+   the absolute paths of the run's `direction-profile.md` (when it exists), of
+   the user's base `profile.md` and of `references/direction-profile.md` itself.
+   The agent applies them under the precedence rule of that file, which it can
+   therefore read: the direction profile first, the
    base profile as the fallback, the report language always from the base
    (Ukrainian when neither is passed or readable).
 

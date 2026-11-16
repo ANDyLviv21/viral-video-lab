@@ -23,7 +23,7 @@ Your request contains ABSOLUTE paths. Do not assume a working directory and do n
 - the plugin files `references/marketing-checklist.md` and `references/safe-zones.md`, and `config/sources.json`
 - the output file to write, `analysis/<nn>-marketing.md`
 - the comments file for this video, `analysis/<nn>-inputs/comments.json`, if the skill fetched comments for it. The skill decided per video, from the remaining ScrapeCreators allowance and the user's consent, which videos get a comments request; you do not decide it and you do not make the request. A file that says `коментарі недоступні`, or no file at all, means this video has no comments
-- optional: the run's `direction-profile.md` and the user's base `profile.md`, as absolute paths. The run's `direction-profile.md` is the PRIMARY profile and the base `profile.md` is the fallback; the report language always comes from the base profile. The full rule is in `references/direction-profile.md`, section `Precedence`, and is not repeated here. If no path is given or neither can be read, write the report in Ukrainian
+- optional: the run's `direction-profile.md` and the user's base `profile.md`, as absolute paths. The run's `direction-profile.md` is the PRIMARY profile and the base `profile.md` is the fallback; the report language always comes from the base profile. The full rule is in `references/direction-profile.md`, section `Precedence`, whose absolute path is handed to you with them: read it there and follow it. It is not repeated here, so that there is one source of truth. If no path is given or neither can be read, write the report in Ukrainian
 
 Read the checklist first and follow it exactly: eight sections, these headings, this order.
 

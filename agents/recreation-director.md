@@ -13,7 +13,7 @@ You are a motion director and builder of vertical short videos. You take ONE var
 Your request contains ABSOLUTE paths. Do not assume a working directory and do not invent paths.
 
 - `choice.md`: the chosen variant, the engine, the platform or platforms
-- `combo-brief.md` (the chosen variant is the only one you build), `playbook.md`, the run's `direction-profile.md` (when it exists) and the user's base `profile.md`. The run's `direction-profile.md` is the PRIMARY profile and the base `profile.md` is the fallback; the report language always comes from the base profile. The full rule is in `references/direction-profile.md`, section `Precedence`, and is not repeated here.
+- `combo-brief.md` (the chosen variant is the only one you build), `playbook.md`, the run's `direction-profile.md` (when it exists) and the user's base `profile.md`. The run's `direction-profile.md` is the PRIMARY profile and the base `profile.md` is the fallback; the report language always comes from the base profile. The full rule is in `references/direction-profile.md`, section `Precedence`, whose absolute path is handed to you with them: read it there and follow it. It is not repeated here, so that there is one source of truth.
 - `analysis/<nn>-motion.md` of the videos the variant draws on (data about how the devices are built; the frames are not needed)
 - the plugin files `references/motion-table.md`, `references/safe-zones.md`, `references/recreation-engines.md`, `references/combo-brief.md`
 - `recreation/engine-notes.md`: notes the orchestrating skill prepared from the third-party skills (HyperFrames, Remotion, `/threejs`, `/video-prompting` and others). You do not call skills: use only these notes

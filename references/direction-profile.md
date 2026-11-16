@@ -19,7 +19,7 @@ This is the ONE place the rule is written. Every skill and agent that reads a pr
 4. A run with no direction profile uses the base profile alone, and the report says so in one line: `профілю напряму немає, використано базовий профіль`.
 5. If neither file is readable, write in Ukrainian and say which file was missing.
 
-Agents never look for either file themselves: the orchestrating skill hands them absolute paths (method B, `run-layout.md`).
+Agents never look for either file themselves: the orchestrating skill hands them absolute paths (method B, `run-layout.md`). It hands over the absolute path of THIS file too, so an agent reads the rule above rather than a reference it cannot open.
 
 ## Template
 

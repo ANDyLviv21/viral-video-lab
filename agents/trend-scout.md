@@ -18,7 +18,7 @@ Your request contains ABSOLUTE paths. Do not assume a working directory and do n
 - the folder `sources-raw/` inside the run folder, with the raw answers of the paid searches the skill already made, and `sources-raw/index.md` listing each file, its source, which query it answers and whether it succeeded
 - the plugin files `references/source-queries.md`, `references/candidates-schema.md` and `config/sources.json`
 - the folder with the trend material that the orchestrating skill prepared from `/last30days`, one file per section (you do not call `/last30days` yourself)
-- optional: the run's `direction-profile.md` and the user's base `profile.md`, as absolute paths. The run's `direction-profile.md` is the PRIMARY profile and the base `profile.md` is the fallback; the report language always comes from the base profile. The full rule is in `references/direction-profile.md`, section `Precedence`, and is not repeated here.
+- optional: the run's `direction-profile.md` and the user's base `profile.md`, as absolute paths. The run's `direction-profile.md` is the PRIMARY profile and the base `profile.md` is the fallback; the report language always comes from the base profile. The full rule is in `references/direction-profile.md`, section `Precedence`, whose absolute path is handed to you with them: read it there and follow it. It is not repeated here, so that there is one source of truth.
 
 ## Rules
 

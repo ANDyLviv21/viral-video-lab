@@ -22,7 +22,7 @@ Your request contains ABSOLUTE paths. Do not assume a working directory and do n
 - the plugin file `references/safe-zones.md`
 - `recreation/stop3.md`, if it exists (lines with `відхилено:` name items that stayed placeholder cards because the user declined the paid generation)
 - the output file `qc.md`
-- optional: the run's `direction-profile.md` and the user's base `profile.md`. The run's `direction-profile.md` is the PRIMARY profile and the base `profile.md` is the fallback; the report language always comes from the base profile. The full rule is in `references/direction-profile.md`, section `Precedence`, and is not repeated here. If neither is given or readable, write in Ukrainian
+- optional: the run's `direction-profile.md` and the user's base `profile.md`. The run's `direction-profile.md` is the PRIMARY profile and the base `profile.md` is the fallback; the report language always comes from the base profile. The full rule is in `references/direction-profile.md`, section `Precedence`, whose absolute path is handed to you with them: read it there and follow it. It is not repeated here, so that there is one source of truth. If neither is given or readable, write in Ukrainian
 
 ## Rules
 
