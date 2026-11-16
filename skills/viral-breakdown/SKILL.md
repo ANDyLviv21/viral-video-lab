@@ -46,7 +46,20 @@ Videos listed in `approved.md` are the only ones analysed. Never touch `videos/u
 
 Each approved video costs 1 ScrapeCreators CREDIT for one comments request, which YOU make (not the agent). Compute: videos approved, credits already spent (`run.json.credits.scrapecreators`, read now, in credits), the limit in `../../config/sources.json` (25 credits per run). Everything you say about these numbers says "credits", never "calls".
 
-Show, in the report language: the number of videos, the credits that will cost, the credits already spent, what is left of the limit, and which videos would get no comments request if the remainder is smaller than the number of videos. State plainly: `Нічого платного не запуститься, поки ти явно не погодишся на цю суму.` Then WAIT.
+Show, in the report language: the number of videos, the credits that will cost, the credits already spent, what is left of the limit, and which videos would get no comments request if the remainder is smaller than the number of videos.
+
+Then, in the same spend line, show the third-party skills this stage runs and say that their cost is unknown. Write it exactly like this, every time, for every skill the stage may use:
+
+```
+/watch: вартість невідома, поза лімітами плагіна
+/social: вартість невідома, поза лімітами плагіна
+/ad-creative: вартість невідома, поза лімітами плагіна
+/last30days: вартість невідома, поза лімітами плагіна
+```
+
+These are third-party skills: this plugin does not know what they cost, they may use their own paid API or key, and whatever they cost falls outside the ScrapeCreators and vidIQ limits. Never call any of them free, and never leave one out because it looks free. `/watch` runs with `--engine local`, which rules out its cloud engines, but that still is not a promise about its cost. A skill that is not installed is shown as `не встановлено` instead.
+
+State plainly: `Нічого платного не запуститься, поки ти явно не погодишся на цю суму.` Then WAIT.
 
 Only a clear yes that refers to THIS figure counts. Silence, a question, a vague answer, a yes to something else, and `не визначено` are NOT a yes. There is no default answer and no timeout. If the figure changes before you start (another video approved, a different remainder), show the new figure and ask again.
 
@@ -58,13 +71,14 @@ or `... | рішення: ні`. This record survives losing the conversation; a
 
 Without a yes, run the stage with the comments request switched off for every video; make no paid call at all. vidIQ is not used here.
 
-For a single-link run add the `/last30days` call of step 4 to this line. `/last30days` is a third-party skill: this plugin does not know what it costs, and whatever it costs falls outside the ScrapeCreators and vidIQ limits. Write `/last30days: вартість невідома, поза лімітами плагіна`; never call it free.
+`/last30days` appears in that list only for a single-link run, which is the only case where this stage runs it (step 4.4); a run that came from `viral-scout` reuses the file the scout already wrote.
 
 ## 4. Preparation in this conversation
 
 Agents do not call third-party skills (method B in `run-layout.md`). Do these steps yourself, for every approved video `<nn>`:
 
 1. Run `/watch` on `videos/<nn>.mp4` with `--engine local` (`--detail token-burner` up to 15 seconds; longer videos in segments of 10 to 15 seconds with `--start` and `--end`; `--resolution 1024` for small text). Store the frames in `analysis/<nn>-frames/` and the transcript in `analysis/<nn>-frames/transcript.txt`. If `/watch` is not installed, tell the user and stop: the breakdown cannot run without frames.
+   Then run `ffprobe` on `videos/<nn>.mp4` YOURSELF and write its duration, frame rate and displayed size to `analysis/<nn>-frames/ffprobe.txt`, one `ключ: значення` per line. The agents hold no `Bash` and never run a command: they read this file. If `ffprobe` fails, write the reason into the file and tell the user.
 2. Create `analysis/<nn>-inputs/`. Run `/social` on the video's transcript and approved line to get a caption, hashtag and cover view of the video, and write the answer to `analysis/<nn>-inputs/social.md`. Run `/ad-creative` on the same material to get the ad-hook view (what hooks and variants this video suggests) and write it to `analysis/<nn>-inputs/ad-creative.md`. If a skill is not installed, write the line `джерело недоступне` as the whole content of that file.
 3. Comments. Work out which videos get a comments request: take the remaining ScrapeCreators allowance (the limit minus `run.json.credits.scrapecreators`, read now), and if the user said yes at step 3, mark the first N videos in `approved.md` order, where N is the smaller of the number of approved videos and the remaining credits. If the user said no, N is 0. For each marked video, in order:
    - Find the comments tool for that platform by the END of its name, as listed in `../../references/source-queries.md` (the prefix differs on every PC), and load it first if it is deferred.
@@ -78,7 +92,7 @@ Agents do not call third-party skills (method B in `run-layout.md`). Do these st
 
 For every approved video start `motion-analyst` and `hook-marketer` in parallel (the two do not read each other's files). If a video-level run fails for one agent, show the error and do not continue with that video until the user decides.
 
-`motion-analyst`: give it ABSOLUTE paths to the frames folder, the transcript file, the video file, `references/motion-table.md`, the output file `analysis/<nn>-motion.md` and the user's `profile.md`.
+`motion-analyst`: give it ABSOLUTE paths to the frames folder, the transcript file, the probe report `analysis/<nn>-frames/ffprobe.txt`, `references/motion-table.md`, the output file `analysis/<nn>-motion.md` and the user's `profile.md`. Do not give it the video file: it has no `Bash` and nothing to do with the .mp4.
 
 `hook-marketer`: give it ABSOLUTE paths to the run folder and the number `nn`, the line for this video from `approved.md`, the frames folder and the transcript, `trends.md` (only if it exists; say so when it does not, as in a single-link run) and `trends-input/Хуки й субтитри.md`, `analysis/<nn>-inputs/` including `comments.json`, `references/marketing-checklist.md`, `references/safe-zones.md`, `config/sources.json`, the output file `analysis/<nn>-marketing.md`, and the user's `profile.md`. The agent makes no comments request: you already made them in step 4.3, so there is no ALLOWED or NOT ALLOWED line any more and no stale count to share between parallel runs.
 

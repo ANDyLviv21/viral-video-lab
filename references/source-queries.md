@@ -20,6 +20,8 @@ Author lookups come after the searches: the skill reads the saved search answers
 
 `sources-raw/index.md` lists one line per attempted call: the source, the tool name ending, which query it answers, the credits it cost, the file it was saved to, and `ok` or `failed: <reason>`. A failed call is listed too, with its real cost if it was charged. The agent reads this file to know what it has.
 
+For an author lookup the line MUST also name the author it belongs to: the platform and the exact handle or author id that was looked up, written as it appears in the search results, for example `автор: tiktok @handle -> sources-raw/scrapecreators-author-tiktok-3.json`. The `<k>` in the filename is only a counter and means nothing on its own. The agent maps an `author_median_views` to an author ONLY through this line; if a file has no such line, or the handle does not match the candidate, it leaves `author_median_views` out rather than guessing, so a median is never attributed to the wrong author.
+
 ## Comments request (stage 4, `viral-breakdown`)
 
 | Platform | Tool (name ending) | Cost | Raw answer saved as |

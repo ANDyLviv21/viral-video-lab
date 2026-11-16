@@ -42,7 +42,15 @@ Create `runs/<YYYY-MM-DD>-<slug>/` in the working folder (slug from the topic, l
 
 Compute the expected CREDITS from `../../references/source-queries.md` for the chosen platforms: vidIQ 2 calls of 5 credits each = 10 credits, ScrapeCreators 1 credit per search page plus 1 credit per author lookup (up to `author_median_lookups_max`). The per-run limits are in `../../config/sources.json` and are also credits (ScrapeCreators 25, vidIQ 10). Everything you say about these numbers says "credits", never "calls".
 
-Show, in the report language: each source, the credits it will cost, the grand total in credits, what is already recorded in `run.json.credits` and therefore already spent, and what is left of each limit. State plainly: `Нічого платного не запуститься, поки ти явно не погодишся на цю суму.` Then WAIT.
+Show, in the report language: each source, the credits it will cost, the grand total in credits, what is already recorded in `run.json.credits` and therefore already spent, and what is left of each limit.
+
+Then, in the same spend line, show the third-party skills this stage runs and say that their cost is unknown. Write it exactly like this, naming every skill the stage may use:
+
+`/last30days: вартість невідома, поза лімітами плагіна`
+
+These are third-party skills: this plugin does not know what they cost, they may use their own paid API or key, and whatever they cost falls outside the ScrapeCreators and vidIQ limits. Never call any of them free, and never leave them out of the line because they look free.
+
+State plainly: `Нічого платного не запуститься, поки ти явно не погодишся на цю суму.` Then WAIT.
 
 Only a clear yes that refers to THIS figure counts. Silence, a question, a vague answer, a yes to something else, and `не визначено` are NOT a yes. There is no default answer and no timeout. If the figure changes before you start (more platforms, a different period, a higher total), that is a new consent step: show the new figure and ask again.
 
@@ -56,14 +64,14 @@ Without a yes, do not make a single paid call and do not start the scout.
 
 ## 4. Trend material, the searches, then the agents
 
-1. Run `/last30days` in this conversation, one query per section, and write each answer to `<run>/trends-input/<section>.md` with the section names `Тема`, `Хуки й субтитри`, `Монтаж і motion` (queries: what is trending on the topic; which hooks and subtitle styles work in short videos on the topic; which editing and motion styles work). If `/last30days` is not installed, write the line `джерело недоступне` as the content of each file. `/last30days` is a third-party skill: this plugin does not know what it costs, and whatever it costs falls outside the ScrapeCreators and vidIQ limits. Say that to the user in the spend line of step 3, as `/last30days: вартість невідома, поза лімітами плагіна`; never call it free.
+1. Run `/last30days` in this conversation, one query per section, and write each answer to `<run>/trends-input/<section>.md` with the section names `Тема`, `Хуки й субтитри`, `Монтаж і motion` (queries: what is trending on the topic; which hooks and subtitle styles work in short videos on the topic; which editing and motion styles work). If `/last30days` is not installed, write the line `джерело недоступне` as the content of each file. Its unknown cost was already shown to the user in the spend line of step 3.
 2. Make the paid searches YOURSELF, here, in this conversation. The `trend-scout` agent has no connector and never calls one. For each query in `../../references/source-queries.md`, for the platforms of this run, in this order:
    - Find the connector tool by the END of its name (the prefix differs on every PC) and load it first if it is deferred.
    - Check the remaining allowance: the limit in `config/sources.json` minus `run.json.credits` read at this moment. If the call would exceed it, skip the call, note it, and do not make it.
    - Make the one call with exactly the parameters the table gives.
    - Immediately write the raw answer to the `sources-raw/` file the table names, add the call's credits to `run.json.credits` (5 for a vidIQ call, 1 for a ScrapeCreators call), and append the call's line to `sources-raw/index.md`. Do this after every call, before the next one, so an interruption still leaves the real spend on disk.
    - A failed call is not retried: write its line as `failed: <reason>` and go on.
-   Then read the saved search answers, pick the authors without `outlier_score` and make at most `author_median_lookups_max` author lookups the same way, each recorded the same way.
+   Then read the saved search answers, pick the authors without `outlier_score` and make at most `author_median_lookups_max` author lookups the same way, each recorded the same way. An author lookup's line in `index.md` must also name the platform and the exact handle it was made for, as `source-queries.md` requires: without it the agent cannot tell which file belongs to which author, and a median could land on the wrong one.
 3. Start the `trend-scout` agent. Give it ABSOLUTE paths to: the run folder, the `sources-raw` folder, `references/source-queries.md`, `references/candidates-schema.md`, `config/sources.json`, the `trends-input` folder and `profile.md`. It writes `candidates.json` and `trends.md` and sets `stage` to `scout`. It spends nothing and writes no `credits`.
 4. Check the scout result: `run.json.stage` is `scout`, `candidates.json` exists and holds 30 to 60 records, and `run.json.credits` (credits, as you recorded them) are within the limits in `config/sources.json`. If any check fails, tell the user which one and what was found, and do not start `top-selector` until the user decides. Then start the `top-selector` agent with ABSOLUTE paths to: the run folder, `scripts/rank.py`, `config/ranking.json` and `references/source-queries.md`. It writes `ranked.json`, `top5.md` and `videos/`, and sets `stage` to `select`.
 

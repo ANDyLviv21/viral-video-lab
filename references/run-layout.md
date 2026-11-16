@@ -14,6 +14,7 @@ runs/<YYYY-MM-DD>-<slug>/
   videos/<nn>.mp4                     nn = top rank before approval, approved.md order after Stop 1
   videos/unused/                      videos not approved at Stop 1
   analysis/<nn>-motion.md  analysis/<nn>-marketing.md  analysis/<nn>-frames/
+  analysis/<nn>-frames/ffprobe.txt     duration, frame rate and size of the video, measured by the skill
   analysis/<nn>-inputs/social.md  analysis/<nn>-inputs/ad-creative.md   from /social and /ad-creative
   analysis/<nn>-inputs/comments.json   the comments answer, fetched by the skill; `коментарі недоступні` when there are none
   review-marketer.md  review-targetolog.md  review-smm.md   one per council role
@@ -24,6 +25,7 @@ runs/<YYYY-MM-DD>-<slug>/
   recreation/stop3.md                 one line per Stop 3 decision, with declined items
   recreation/assets/  recreation/assets/index.md   generated or filmed assets, made after a yes at Stop 3
   recreation/draft-frames/            frames and transcript of draft.mp4, from /watch
+  recreation/draft-frames/ffprobe.txt duration, frame rate and size of draft.mp4, measured by the skill
   recreation/replica-qc.md            only if /reference-video-replica-qc is installed
   qc.md
   qc-own/inputs/social.md  qc-own/inputs/ad-creative.md   placeholders for the own video
@@ -64,7 +66,7 @@ A stage writes its value after it finishes successfully, never before. A stage t
 | 1 scout | `trend-scout` | `candidates.json`, `trends.md`; in `run.json` only `stage: scout`. It calls no connector and writes no `credits` |
 | 2 select | `top-selector` | `ranked.json`, `top5.md`, `videos/<nn>.mp4`; in `run.json` only `stage: select` |
 | Stop 1: user approves references | skill | `approved.md`, `run.json.approved` and `stage: approve`, renumbered `videos/<nn>.mp4`, `videos/unused/` |
-| 3 prepare (before the agent runs) | skill | `analysis/<nn>-frames/` (frames and transcript, from `/watch`) |
+| 3 prepare (before the agent runs) | skill | `analysis/<nn>-frames/` (frames and transcript, from `/watch`); `analysis/<nn>-frames/ffprobe.txt` (the skill runs `ffprobe` on `videos/<nn>.mp4`) |
 | 3 breakdown | `motion-analyst` | `analysis/<nn>-motion.md` |
 | 4 consent | skill | `spend-consent.md` (one appended line per decision; no comments request before a yes) |
 | 4 prepare (before the agent runs) | skill | `analysis/<nn>-inputs/social.md`, `analysis/<nn>-inputs/ad-creative.md` (from `/social` and `/ad-creative`); `analysis/<nn>-inputs/comments.json` (the one comments request per allowed video, made by the skill); `run.json.credits.scrapecreators` immediately after each comments request; `stage: breakdown` once all breakdown files exist |
@@ -79,7 +81,7 @@ A stage writes its value after it finishes successfully, never before. A stage t
 | Stop 3 (inside stage 7) | skill | `recreation/stop3.md`: one appended line per decision, yes or no, with what was shown, the sum, the date and time, and `відхилено: <item> -> заглушка` for each declined item. After a yes only: `recreation/assets/`, `recreation/assets/index.md`, the actual spend in `run.json.credits.generation` |
 | 7 recreate | `recreation-director` | `recreation/storyboard.md`, `recreation/project/`, `recreation/draft.mp4`, `recreation/paid-request.md` (only when it stops for Stop 3) |
 | 7 close | skill | `run.json.stage: recreate` after `draft.mp4` passes `ffprobe` (1080x1920, up to 90 s); `run.json.qc_rounds` |
-| 8 prepare (before the agents run) | skill | `recreation/draft-frames/` (from `/watch`), `recreation/replica-qc.md` (optional), `qc-own/inputs/*.md` |
+| 8 prepare (before the agents run) | skill | `recreation/draft-frames/` (from `/watch`), `recreation/draft-frames/ffprobe.txt` (the skill runs `ffprobe` on `draft.mp4`), `recreation/replica-qc.md` (optional), `qc-own/inputs/*.md` |
 | 8 qc | `quality-controller` | `qc.md` |
 | 8 own-video review | `motion-analyst`, `hook-marketer`, `review-council` (same agents as stages 3 to 5, run on `draft.mp4` with the label `власний`) | `qc-own/own-motion.md`, `qc-own/own-marketing.md`, `qc-own/review-marketer.md`, `qc-own/review-targetolog.md`, `qc-own/review-smm.md`, `qc-own/review.md` |
 | 8 close | skill | `run.json.stage: qc` after the verdict is accepted; then `final/<platform>.mp4` (from `/ffmpeg-skill`), the rows of `library/patterns.md`, `run.json.stage: done` |
@@ -119,7 +121,7 @@ Method B works whether or not agents can call skills, so it is the safe choice. 
 Handoff for `motion-analyst`:
 
 1. The orchestrating skill runs `/watch` on `videos/<nn>.mp4` with `--engine local` (`--detail token-burner` for videos up to 15 seconds; longer videos in segments of 10 to 15 seconds with `--start` and `--end`; `--resolution 1024` for small text), in the main conversation.
-2. It stores the frames in `analysis/<nn>-frames/` and the transcript in a text file, for example `analysis/<nn>-frames/transcript.txt`.
-3. It starts the agent with absolute paths to: the frames folder, the transcript file, the video file (for `ffprobe` only), `references/motion-table.md`, the output file `analysis/<nn>-motion.md`, and optionally the absolute path of the user's `profile.md` (if it is not passed or cannot be read, the agent writes the report in Ukrainian).
+2. It stores the frames in `analysis/<nn>-frames/` and the transcript in a text file, for example `analysis/<nn>-frames/transcript.txt`, and runs `ffprobe` on the video itself, writing the duration, frame rate and displayed size to `analysis/<nn>-frames/ffprobe.txt`.
+3. It starts the agent with absolute paths to: the frames folder, the transcript file, `analysis/<nn>-frames/ffprobe.txt` (not the video file: the agent has no `Bash`), `references/motion-table.md`, the output file `analysis/<nn>-motion.md`, and optionally the absolute path of the user's `profile.md` (if it is not passed or cannot be read, the agent writes the report in Ukrainian).
 
 Other agents follow the same rule: anything that needs a third-party skill is prepared by the orchestrating skill, and the agent receives only the resulting files.
