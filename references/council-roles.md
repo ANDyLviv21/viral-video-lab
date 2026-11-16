@@ -4,9 +4,9 @@ Used by the `review-council` agent. The same agent runs once per role, then once
 
 | Role (exact name) | File written by the role run |
 |-------------------|------------------------------|
-| `Маркетолог` | `review-маркетолог.md` |
-| `Таргетолог` | `review-таргетолог.md` |
-| `SMM-фахівець` | `review-smm-фахівець.md` |
+| `Маркетолог` | `review-marketer.md` |
+| `Таргетолог` | `review-targetolog.md` |
+| `SMM-фахівець` | `review-smm.md` |
 
 The consolidating run writes `review.md`.
 

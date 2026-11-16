@@ -12,7 +12,7 @@ runs/<YYYY-MM-DD>-<slug>/
   videos/unused/                      videos not approved at Stop 1
   analysis/<nn>-motion.md  analysis/<nn>-marketing.md  analysis/<nn>-frames/
   analysis/<nn>-inputs/social.md  analysis/<nn>-inputs/ad-creative.md   from /social and /ad-creative
-  review-маркетолог.md  review-таргетолог.md  review-smm-фахівець.md   one per council role
+  review-marketer.md  review-targetolog.md  review-smm.md   one per council role
   review.md  playbook.md  combo-brief.md
   recreation/storyboard.md  recreation/project/  recreation/draft.mp4
   qc.md  final/<platform>.mp4
@@ -47,7 +47,7 @@ A stage writes its value after it finishes successfully, never before. A stage t
 | 3 breakdown | `motion-analyst` | `analysis/<nn>-motion.md` |
 | 4 prepare (before the agent runs) | skill | `analysis/<nn>-inputs/social.md`, `analysis/<nn>-inputs/ad-creative.md` (from `/social` and `/ad-creative`); `run.json.credits.scrapecreators` after each comments request; `stage: breakdown` once all breakdown files exist |
 | 4 breakdown | `hook-marketer` | `analysis/<nn>-marketing.md` (it reads no `-motion.md`: both agents run in parallel) |
-| 5 review | `review-council` | `review-<role>.md` (one run per role, each reads no other role's file), then `review.md` (consolidating run, reads the three role files) |
+| 5 review | `review-council` | `review-marketer.md`, `review-targetolog.md`, `review-smm.md` (one run per role, each reads no other role's file), then `review.md` (consolidating run, reads the three role files) |
 | 5 close | skill | `run.json.stage: review` after `review.md` exists |
 | 6 synthesis | `synthesizer` | `playbook.md`, `combo-brief.md` |
 | Stop 2: user picks a combo variant | none | none |

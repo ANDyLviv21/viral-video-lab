@@ -56,7 +56,7 @@ Check the result: for each approved video `analysis/<nn>-motion.md` and `analysi
 
 Start `review-council` three times, once per role, then a fourth time to consolidate. Run the three role runs in parallel. Give every run ABSOLUTE paths and a line `mode: role` and `role: <name>` or `mode: consolidate`.
 
-Role runs (`Маркетолог`, `Таргетолог`, `SMM-фахівець`): give each one `approved.md`, every `analysis/<nn>-marketing.md` and `analysis/<nn>-motion.md`, the frames folders, `references/council-roles.md`, `references/safe-zones.md`, `profile.md`, and ONE output file: `review-маркетолог.md`, `review-таргетолог.md` or `review-smm-фахівець.md` in the run folder. Give a role run no other role's file and do not mention them.
+Role runs (`Маркетолог`, `Таргетолог`, `SMM-фахівець`): give each one `approved.md`, every `analysis/<nn>-marketing.md` and `analysis/<nn>-motion.md`, the frames folders, `references/council-roles.md`, `references/safe-zones.md`, `profile.md`, and ONE output file: `review-marketer.md`, `review-targetolog.md` or `review-smm.md` in the run folder. Give a role run no other role's file and do not mention them.
 
 Consolidation run: give it only the three role files, `references/council-roles.md`, `profile.md` and the output file `review.md`.
 
