@@ -51,7 +51,7 @@ class RankTests(unittest.TestCase):
         self.addCleanup(self._tmp.cleanup)
         self.tmp = Path(self._tmp.name)
 
-    def run_main(self, cands, stdout=None):
+    def run_main(self, cands, stdout=None, extra=None):
         src = self.tmp / "candidates.json"
         cfg = self.tmp / "ranking.json"
         write_file(src, {"topic": "t", "generated_at": NOW.isoformat(),
@@ -61,7 +61,8 @@ class RankTests(unittest.TestCase):
         with contextlib.redirect_stdout(out):
             code = rank.main([str(src), "--config", str(cfg),
                               "--out-json", str(self.tmp / "ranked.json"),
-                              "--out-md", str(self.tmp / "top5.md")])
+                              "--out-md", str(self.tmp / "top5.md")]
+                             + list(extra or []))
         return code
 
     def test_missing_metric_is_dropped_not_zeroed(self):
@@ -220,6 +221,61 @@ class RankTests(unittest.TestCase):
                               str(cfg), "--out-json", str(self.tmp / "r.json"),
                               "--out-md", str(self.tmp / "t.md")])
         self.assertEqual(code, 2)
+
+    def test_period_days_cli_overrides_config(self):
+        """A 90-day run must keep a 60-day-old video the config would drop."""
+        cands = [cand("old", posted_at=iso(60)), cand("fresh")]
+        self.assertEqual(self.run_main(cands), 0)
+        ranked = json.loads((self.tmp / "ranked.json").read_text(encoding="utf-8"))
+        self.assertEqual([d["reason"] for d in ranked["dropped"]], ["period"])
+
+        self.assertEqual(self.run_main(cands, extra=["--period-days", "90"]), 0)
+        ranked = json.loads((self.tmp / "ranked.json").read_text(encoding="utf-8"))
+        self.assertEqual(ranked["dropped"], [])
+        self.assertEqual(sorted(t["id"] for t in ranked["top"]), ["fresh", "old"])
+
+    def test_max_duration_sec_cli_overrides_config(self):
+        cands = [cand("long", duration_sec=120), cand("short")]
+        self.assertEqual(self.run_main(cands), 0)
+        ranked = json.loads((self.tmp / "ranked.json").read_text(encoding="utf-8"))
+        self.assertEqual([d["reason"] for d in ranked["dropped"]], ["duration"])
+
+        self.assertEqual(
+            self.run_main(cands, extra=["--max-duration-sec", "180"]), 0)
+        ranked = json.loads((self.tmp / "ranked.json").read_text(encoding="utf-8"))
+        self.assertEqual(ranked["dropped"], [])
+
+    def test_dedupe_by_url_when_ids_differ(self):
+        """vidIQ and ScrapeCreators give the same reel different id strings."""
+        vidiq = cand("3078421556", platform="instagram",
+                     url="https://www.instagram.com/reel/C8kQw1xPqRs/",
+                     source="vidiq", saves=None)
+        scrape = cand("ig_C8kQw1xPqRs", platform="instagram",
+                      url="https://instagram.com/reel/C8kQw1xPqRs/?igsh=MXY5",
+                      source="scrapecreators", saves=120)
+        for order in ([vidiq, scrape], [scrape, vidiq]):
+            out = rank.dedupe(copy.deepcopy(order))
+            self.assertEqual(len(out), 1)
+            self.assertEqual(out[0]["saves"], 120)
+
+    def test_dedupe_by_url_keeps_different_videos(self):
+        a = cand("a", url="https://www.tiktok.com/@u/video/111", platform="tiktok")
+        b = cand("b", url="https://www.tiktok.com/@u/video/222", platform="tiktok")
+        self.assertEqual(len(rank.dedupe([a, b])), 2)
+
+    def test_non_finite_numbers_are_malformed(self):
+        self.assertTrue(rank.is_malformed(cand("inf", views=float("inf"))))
+        self.assertTrue(rank.is_malformed(cand("ninf", views=float("-inf"))))
+        self.assertTrue(rank.is_malformed(cand("nan", duration_sec=float("nan"))))
+
+    def test_poisoned_infinity_does_not_win_and_output_stays_json(self):
+        self.assertEqual(
+            self.run_main([cand("poison", views=float("inf")), cand("ok")]), 0)
+        text = (self.tmp / "ranked.json").read_text(encoding="utf-8")
+        self.assertNotIn("Infinity", text)
+        ranked = json.loads(text)
+        self.assertEqual([t["id"] for t in ranked["top"]], ["ok"])
+        self.assertEqual([d["reason"] for d in ranked["dropped"]], ["malformed"])
 
 
 if __name__ == "__main__":

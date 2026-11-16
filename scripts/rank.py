@@ -3,6 +3,10 @@
 Usage:
     py -3.12 scripts/rank.py <candidates.json> --config <ranking.json>
         --out-json <ranked.json> --out-md <top5.md>
+        [--period-days N] [--max-duration-sec N]
+
+`--period-days` and `--max-duration-sec` override the matching config keys, so
+a run searched over 90 days is not filtered back to the config's 30.
 
 Exit codes: 0 success (even with fewer than top_n videos, and even when some
 candidate records are malformed: those go to "dropped" with reason "malformed");
@@ -12,10 +16,12 @@ Standard library only. Console output is ASCII only.
 """
 import argparse
 import json
+import math
 import statistics
 import sys
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
+from urllib.parse import urlsplit
 
 FIELDS = ("id", "platform", "url", "author", "caption", "posted_at",
           "duration_sec", "views", "likes", "comments", "shares", "saves",
@@ -43,7 +49,12 @@ NUMERIC_FIELDS = ("duration_sec", "views", "likes", "comments", "shares",
 
 
 def _is_number(v) -> bool:
-    return isinstance(v, (int, float)) and not isinstance(v, bool)
+    """A finite real number. NaN and +/-Infinity are not numbers here: they
+    survive json.load, beat every percentile and are written back as invalid
+    JSON, so a poisoned record must be dropped as malformed instead."""
+    if not isinstance(v, (int, float)) or isinstance(v, bool):
+        return False
+    return math.isfinite(v)
 
 
 def validate_config(cfg) -> None:
@@ -97,14 +108,53 @@ def filled(c: dict) -> int:
     return sum(1 for f in FIELDS if c.get(f) is not None)
 
 
-def dedupe(cands: list) -> list:
-    """One record per (platform, id): the one with more non-null fields; tie -> first."""
+def canonical_url(url) -> tuple:
+    """Host and path of a video URL, for matching the same video across sources.
+
+    The host loses its case and a leading `www.`; the path loses a trailing
+    slash; the query string and the fragment are dropped (`?igsh=...` and
+    friends differ per source). Returns None for anything unparseable, which
+    never matches.
+    """
+    if not isinstance(url, str) or not url.strip():
+        return None
+    parts = urlsplit(url.strip())
+    host = (parts.netloc or "").lower()
+    if host.startswith("www."):
+        host = host[4:]
+    path = (parts.path or "").rstrip("/")
+    if not host or not path:
+        return None
+    return (host, path)
+
+
+def _merge_by_key(cands: list, key_of) -> list:
+    """Keep one record per key: more non-null fields wins, tie -> first.
+    A record whose key is None is kept as it is."""
     best: dict = {}
+    out: list = []
     for c in cands:
-        key = (c.get("platform"), c.get("id"))
-        if key not in best or filled(c) > filled(best[key]):
-            best[key] = c
-    return list(best.values())
+        key = key_of(c)
+        if key is None:
+            out.append(c)
+            continue
+        if key not in best:
+            best[key] = len(out)
+            out.append(c)
+        elif filled(c) > filled(out[best[key]]):
+            out[best[key]] = c
+    return out
+
+
+def dedupe(cands: list) -> list:
+    """Two passes: first by (platform, id), then by canonical URL.
+
+    vidIQ and ScrapeCreators do not return the same id string for the same
+    Instagram or TikTok video, so the id pass alone lets one video into the
+    top list twice. The URL pass catches that.
+    """
+    out = _merge_by_key(cands, lambda c: (c.get("platform"), c.get("id")))
+    return _merge_by_key(out, lambda c: canonical_url(c.get("url")))
 
 
 def filter_candidates(cands: list, cfg: dict, now: datetime) -> tuple:
@@ -239,6 +289,22 @@ def render_markdown(result: dict, dropped: list, cfg: dict) -> str:
     return "\n".join(lines)
 
 
+def scrub_non_finite(value):
+    """Replace NaN and +/-Infinity with None, recursively.
+
+    A malformed record is echoed into `dropped`, and `json.dumps` would write
+    its poisoned number as the bare literal `Infinity` or `NaN`, which is not
+    valid JSON and breaks every reader of `ranked.json`.
+    """
+    if isinstance(value, float) and not math.isfinite(value):
+        return None
+    if isinstance(value, dict):
+        return {k: scrub_non_finite(v) for k, v in value.items()}
+    if isinstance(value, list):
+        return [scrub_non_finite(v) for v in value]
+    return value
+
+
 def _ascii(text) -> str:
     return str(text).encode("ascii", "backslashreplace").decode("ascii")
 
@@ -255,12 +321,21 @@ def main(argv=None) -> int:
     ap.add_argument("--config", required=True)
     ap.add_argument("--out-json", required=True)
     ap.add_argument("--out-md", required=True)
+    ap.add_argument("--period-days", type=float, default=None,
+                    help="Override period_days from the config (the run's own "
+                         "period, from run.json)")
+    ap.add_argument("--max-duration-sec", type=float, default=None,
+                    help="Override max_duration_sec from the config")
     args = ap.parse_args(argv)
 
     try:
         data = load_candidates(args.candidates)
         with open(args.config, encoding="utf-8") as fh:
             cfg = json.load(fh)
+        if args.period_days is not None:
+            cfg["period_days"] = args.period_days
+        if args.max_duration_sec is not None:
+            cfg["max_duration_sec"] = args.max_duration_sec
         validate_config(cfg)
         now = parse_iso(data["generated_at"])
     except (OSError, ValueError, KeyError, TypeError) as exc:
@@ -276,7 +351,9 @@ def main(argv=None) -> int:
     output = {"topic": result["topic"], "generated_at": result["generated_at"],
               "top": result["top"], "reserve": result["reserve"],
               "dropped": dropped}
-    _write(args.out_json, json.dumps(output, ensure_ascii=False, indent=2))
+    _write(args.out_json, json.dumps(scrub_non_finite(output),
+                                     ensure_ascii=False, indent=2,
+                                     allow_nan=False))
     _write(args.out_md, render_markdown(result, dropped, cfg))
     print("top: {}, reserve: {}, dropped: {}".format(
         len(result["top"]), len(result["reserve"]), len(dropped)))
