@@ -24,11 +24,13 @@ The step is chosen from `stage` in `run.json`, read at this moment, never from w
 
 Files from finished stages are not overwritten without asking first. Before a step would write a file that already exists (for example `candidates.json`, `trends.md`, `ranked.json`, `top5.md`, `approved.md`, or a video in `videos/`), name the file, say what would be lost, and wait for a clear yes that names it. Silence or a yes to something else is not a yes. If the user would rather keep the old text, move the existing file aside yourself before writing: rename it to `<name>.bak-YYYY-MM-DD-HHMM` in the same folder, say the new name, and then write the new file. Never delete it and never move a file aside without the user asking for it.
 
-## 1. Profile
+## 1. Base profile
 
-Look for `profile.md` in the user's current working folder (not inside the plugin). If it is missing, send the user to the `viral-lab-setup` skill and stop. Otherwise read it and take the report language from the "Мова звітів" section (default Ukrainian).
+Look for `profile.md` in the user's current working folder (not inside the plugin). This is the BASE profile: character, manner, platform priority, report language, what to avoid always. If it is missing, send the user to the `viral-lab-setup` skill and stop. Otherwise read it and take the report language from the "Мова звітів" section (default Ukrainian). The report language always comes from this file, whatever the direction profile of step 2 says.
 
-## 2. Brief and run folder
+The two layers and the precedence between them are described once, in `../../references/direction-profile.md`. Read that file before step 2.
+
+## 2. Brief, the direction profile and the run folder
 
 Ask the user for:
 
@@ -36,7 +38,21 @@ Ask the user for:
 - the platforms (default Instagram and TikTok, YouTube Shorts third)
 - the period in days (default 30)
 
-Create `runs/<YYYY-MM-DD>-<slug>/` in the working folder (slug from the topic, lowercase ASCII, hyphens). Write `run.json` with `topic`, `slug`, `created_at`, `platforms`, `period_days`, `stage` set to `brief`, `approved` as `[]` and `credits` as `{"scrapecreators": 0, "vidiq": 0}`. Write `brief.md` with the topic, platforms, period and the relevant parts of `profile.md` (audience, style, what to avoid).
+Create `runs/<YYYY-MM-DD>-<slug>/` in the working folder (slug from the topic, lowercase ASCII, hyphens). Write `run.json` with `topic`, `slug`, `created_at`, `platforms`, `period_days`, `stage` set to `brief`, `direction_profile` as `null` for now, `approved` as `[]` and `credits` as `{"scrapecreators": 0, "vidiq": 0}`.
+
+### 2.1 The direction profile
+
+Андрій works in several directions, so this run gets a profile OF ITS OWN DIRECTION. It is written here, at the brief step, before the spend line of step 3 and before any paid call. Do not add a separate stop for it: it is part of this step and it ends with one yes.
+
+1. Work out the direction slug from the topic (lowercase ASCII, hyphens). If `library/profiles/<slug>.md` already exists in the working folder, read it: that is the saved profile of this direction and it is the starting point.
+2. **Propose, do not interrogate.** Fill every section of the template in `../../references/direction-profile.md` yourself — from the topic the user named, the saved profile if there was one, and the base `profile.md` — and show the whole filled profile to the user in the report language, as text they can read in one go. Do not ask the sections one by one and do not leave a section for the user to fill: a section you genuinely cannot infer says `не визначено`, and you say which ones those are in one line.
+3. Ask for one answer: `так` accepts it as shown, anything else is a correction. Apply the corrections, show the changed lines, and ask again. The user must be able to say `так` once and move on.
+4. After the yes, write the text to `<run>/direction-profile.md`, write the same text to `library/profiles/<slug>.md` in the working folder (create `library/profiles/` if needed; an existing file is replaced by the confirmed version), and set `run.json.direction_profile` to the slug.
+5. If the user declines a direction profile, leave `run.json.direction_profile` as `null`, write no `direction-profile.md`, and say in one line that the run will use the base profile alone (`профілю напряму немає, використано базовий профіль`). Say the same line again in the report of the run.
+
+### 2.2 The brief
+
+Write `brief.md` with the topic, platforms, period and the relevant parts of the profile — audience, style and what to avoid taken from `<run>/direction-profile.md`, falling back to the base `profile.md` under the precedence rule.
 
 ## 3. Expected spend, and the consent that unlocks it
 
@@ -72,7 +88,7 @@ Without a yes, do not make a single paid call and do not start the scout.
    - Immediately write the raw answer to the `sources-raw/` file the table names, add the call's credits to `run.json.credits` (5 for a vidIQ call, 1 for a ScrapeCreators call), and append the call's line to `sources-raw/index.md`. Do this after every call, before the next one, so an interruption still leaves the real spend on disk.
    - A failed call is not retried: write its line as `failed: <reason>` and go on.
    Then read the saved search answers, pick the authors without `outlier_score` and make at most `author_median_lookups_max` author lookups the same way, each recorded the same way. An author lookup's line in `index.md` must also name the platform and the exact handle it was made for, as `source-queries.md` requires: without it the agent cannot tell which file belongs to which author, and a median could land on the wrong one.
-3. Start the `trend-scout` agent. Give it ABSOLUTE paths to: the run folder, the `sources-raw` folder, `references/source-queries.md`, `references/candidates-schema.md`, `config/sources.json`, the `trends-input` folder and `profile.md`. It writes `candidates.json` and `trends.md` and sets `stage` to `scout`. It spends nothing and writes no `credits`.
+3. Start the `trend-scout` agent. Give it ABSOLUTE paths to: the run folder, the `sources-raw` folder, `references/source-queries.md`, `references/candidates-schema.md`, `config/sources.json`, the `trends-input` folder, the run's `direction-profile.md` (when it exists) and the base `profile.md`. It writes `candidates.json` and `trends.md` and sets `stage` to `scout`. It spends nothing and writes no `credits`.
 4. Check the scout result: `run.json.stage` is `scout`, `candidates.json` exists and holds 30 to 60 records, and `run.json.credits` (credits, as you recorded them) are within the limits in `config/sources.json`. If any check fails, tell the user which one and what was found, and do not start `top-selector` until the user decides. Then start the `top-selector` agent with ABSOLUTE paths to: the run folder, `scripts/rank.py`, `config/ranking.json` and `references/source-queries.md`. It writes `ranked.json`, `top5.md` and `videos/`, and sets `stage` to `select`.
 
 If an agent stops with an error, show it to the user and do not continue.
